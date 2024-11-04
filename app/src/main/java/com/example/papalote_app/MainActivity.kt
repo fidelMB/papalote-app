@@ -7,10 +7,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.papalote_app.components.NavBar
+import com.example.papalote_app.navigation.Screen
+import com.example.papalote_app.screens.Events
+import com.example.papalote_app.screens.Favorites
+import com.example.papalote_app.screens.Map
+import com.example.papalote_app.screens.Profile
+import com.example.papalote_app.screens.QR
 import com.example.papalote_app.ui.theme.PapaloteappTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,10 +28,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PapaloteappTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                val navController = rememberNavController()
+
+                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = { NavBar(navController = navController) }) { innerPadding ->
+                    MainNavigation(
+                        modifier = Modifier.padding(innerPadding),
+                        navController
                     )
                 }
             }
@@ -30,18 +41,33 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
+fun MainNavigation(modifier: Modifier = Modifier, navController: NavHostController) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.QR.route,
         modifier = modifier
     )
-}
+    {
+        composable(Screen.Events.route) {
+            Events(navController = navController)
+        }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PapaloteappTheme {
-        Greeting("Android")
+        composable(Screen.Map.route) {
+            Map(navController = navController)
+        }
+
+        composable(Screen.QR.route) {
+            QR(navController = navController)
+        }
+
+        composable(Screen.Favorites.route) {
+            Favorites(navController = navController)
+        }
+
+        composable(Screen.Profile.route) {
+            Profile(navController = navController)
+        }
     }
 }
