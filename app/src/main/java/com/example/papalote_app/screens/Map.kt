@@ -38,7 +38,6 @@ fun Map(navController: NavController) {
         navController.popBackStack()
     }
 
-    // Código de ZoomableMapScreen aquí
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
