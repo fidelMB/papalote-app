@@ -44,7 +44,8 @@ fun Map(navController: NavController) {
         // Barra de navegación para los pisos
         TabRow(
             selectedTabIndex = selectedTabIndex,
-            containerColor = Color(0xFF6200EE)
+            containerColor = Color.White, //color del TabRow
+            contentColor = Color.Black // Color de texto del Tab seleccionado
         ) {
             pisos.forEachIndexed { index, title ->
                 Tab(
@@ -380,19 +381,22 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 .pointerInput(Unit) {
                     detectTapGestures { tapOffset ->
                         areas.forEachIndexed { index, area ->
-                            val transformedPoints = area.points.map { point ->
-                                Offset(
-                                    x = (point.x + area.initialOffset.x) * scale.value + offset.value.x,
-                                    y = (point.y + area.initialOffset.y) * scale.value + offset.value.y
-                                )
-                            }
-                            if (isPointInPolygon(tapOffset, transformedPoints)) {
-                                coroutineScope.launch {
-                                    areaColors[index].value = Color.Green
-                                    delay(300)
-                                    areaColors[index].value = area.initialColor
+                            // Verifica si el área es decorativa y no debe reaccionar a clics
+                            if (area.label !in listOf("Background", "DarkedZone", "DarkedZone2")) {
+                                val transformedPoints = area.points.map { point ->
+                                    Offset(
+                                        x = (point.x + area.initialOffset.x) * scale.value + offset.value.x,
+                                        y = (point.y + area.initialOffset.y) * scale.value + offset.value.y
+                                    )
                                 }
-                                area.onClick()
+                                if (isPointInPolygon(tapOffset, transformedPoints)) {
+                                    coroutineScope.launch {
+                                        areaColors[index].value = Color.Green
+                                        delay(300)
+                                        areaColors[index].value = area.initialColor
+                                    }
+                                    area.onClick()
+                                }
                             }
                         }
                     }
