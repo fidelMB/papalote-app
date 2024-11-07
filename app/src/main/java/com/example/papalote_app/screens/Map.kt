@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
 // Datos de cada área poligonal
 data class PolygonArea(
     val points: List<Offset>, // Puntos que definen el polígono
