@@ -11,5 +11,5 @@ fun Map(navController: NavController) {
         navController.popBackStack()
     }
 
-    Text("Mapa")
+    Text("Mapa") //Map
 }
