@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,56 +41,35 @@ fun Map(navController: NavController) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val pisos = listOf("Piso 1", "Piso 2", "Piso 3")
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Barra de navegación para los pisos
-        TabRow(
-            selectedTabIndex = selectedTabIndex,
-            containerColor = Color.White, //color del TabRow
-            contentColor = Color.Black // Color de texto del Tab seleccionado
-        ) {
-            pisos.forEachIndexed { index, title ->
-                Tab(
-                    selected = selectedTabIndex == index,
-                    onClick = { selectedTabIndex = index },
-                    text = { Text(title) }
-                )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Colocamos el TabRow en una capa superior usando zIndex
+        Box(modifier = Modifier.zIndex(1f)) {
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = Color.White, // Color del TabRow
+                contentColor = Color.Black // Color de texto del Tab seleccionado
+            ) {
+                pisos.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = { Text(title) }
+                    )
+                }
             }
         }
 
-        // Contenido de cada piso
-        when (selectedTabIndex) {
-            0 -> PisoContent(piso = 0) // Usa el índice como Int en lugar de String
-            1 -> PisoContent(piso = 1)
-            2 -> PisoContent(piso = 2)
-        }
-
-        // Controles para navegar entre los pisos
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = {
-                    if (selectedTabIndex > 0) selectedTabIndex-- // Ir al piso anterior
-                },
-                enabled = selectedTabIndex > 0
-            ) {
-                Text("Piso Anterior")
-            }
-
-            Button(
-                onClick = {
-                    if (selectedTabIndex < pisos.size - 1) selectedTabIndex++ // Ir al siguiente piso
-                },
-                enabled = selectedTabIndex < pisos.size - 1
-            ) {
-                Text("Siguiente Piso")
+        // Contenido de cada piso, que incluye el mapa interactivo
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (selectedTabIndex) {
+                0 -> PisoContent(piso = 0) // Contenido del Piso 1
+                1 -> PisoContent(piso = 1) // Contenido del Piso 2
+                2 -> PisoContent(piso = 2) // Contenido del Piso 3
             }
         }
     }
 }
+
 
 // Función para verificar si un punto está dentro de un polígono
 fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
