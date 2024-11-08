@@ -89,14 +89,6 @@ fun Map(navController: NavController) {
             }
         }
     }
-
-    // Tu lógica de zoom, desplazamiento, y dibujo de polígonos puede permanecer sin cambios aquí
-    var scale by remember { mutableStateOf(1f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
-    val coroutineScope = rememberCoroutineScope()
-
-    // Estado de colores y detección de gestos
-    // (Este código se mantendrá como antes, sin cambios en esta sección)
 }
 
 // Función para verificar si un punto está dentro de un polígono
@@ -162,7 +154,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color.Gray,
             label = "Background",
             onClick = { /* Acción visual sin clic */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
             points = listOf(
@@ -179,7 +172,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color(0xFF800080),
             label = "Baylab",
             onClick = { /* Acción para Baylab */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
             points = listOf(
@@ -201,7 +195,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color.Cyan,
             label = "Monstruo de Aramberri",
             onClick = { /* Acción para Monstruo de Aramberri */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
             points = listOf(
@@ -217,7 +212,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color(0xFF55CDD0), //#55cdd0
             label = "Barco",
             onClick = { /* Acción para Barco */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
             points = listOf(
@@ -241,7 +237,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color.Red,
             label = "Decidir",
             onClick = { /* Acción para Decidir */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
             points = listOf(
@@ -271,7 +268,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color(0xFFFF7923),
             label = "Relieve",
             onClick = { /* Acción para Relieve */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
             points = listOf(
@@ -290,7 +288,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color.Cyan,
             label = "MegapantallaIMAX",
             onClick = { /* Acción para MegapantallaIMAX */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         // Polígonos sin interacción de clic
         PolygonArea(
@@ -311,7 +310,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color.DarkGray,
             label = "DarkedZone",
             onClick = { /* Acción visual sin clic */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
             points = listOf(
@@ -335,7 +335,8 @@ fun piso2Areas(): List<PolygonArea> {
             initialColor = Color.DarkGray,
             label = "DarkedZone2",
             onClick = { /* Acción visual sin clic */ },
-            initialOffset = Offset(90f, 1130f)
+//            initialOffset = Offset(90f, 1130f)
+            initialOffset = Offset(-60f, 400f)
         )
     )
 }
@@ -358,7 +359,7 @@ fun piso3Areas(): List<PolygonArea> {
 
 @Composable
 fun MapaInteractivo(areas: List<PolygonArea>) {
-    val scale = remember { mutableStateOf(1f) }
+    val scale = remember { mutableStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
     val areaColors = remember { areas.map { mutableStateOf(it.initialColor) } }
