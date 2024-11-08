@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,7 +42,7 @@ fun Map(navController: NavController) {
     }
 
     // Estado para la pestaña seleccionada (representando los pisos)
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pisos = listOf("PB", "S1", "S2")
 
     Box(
@@ -119,7 +117,7 @@ fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
     return intersections % 2 == 1
 }
 
-fun piso1Areas(): List<PolygonArea> {
+fun plantaBaja(): List<PolygonArea> {
     return listOf(
             PolygonArea(
                 points = listOf(
@@ -178,7 +176,7 @@ fun piso1Areas(): List<PolygonArea> {
     )
 }
 
-fun piso2Areas(): List<PolygonArea> {
+fun sotano1(): List<PolygonArea> {
     return listOf(
         PolygonArea(
             points = listOf(
@@ -228,7 +226,7 @@ fun piso2Areas(): List<PolygonArea> {
                 Offset(597f, 689f), Offset(597f, 773f), Offset(662f, 772f), Offset(710f, 681f),
                 Offset(708f, 665f), Offset(719f, 638f), Offset(647f, 676f), Offset(634f, 689f)
             ),
-            initialColor = Color(0x55cdd0),
+            initialColor = Color(0xFF55CDD0),
             label = "Submarino",
             onClick = { /* Acción para Submarino */ },
             initialOffset = Offset(20f, 400f)
@@ -391,7 +389,7 @@ fun piso2Areas(): List<PolygonArea> {
     )
 }
 
-fun piso3Areas(): List<PolygonArea> {
+fun sotano2(): List<PolygonArea> {
     return listOf(
         PolygonArea(
             points = listOf(
@@ -605,7 +603,7 @@ fun piso3Areas(): List<PolygonArea> {
 
 @Composable
 fun MapaInteractivo(areas: List<PolygonArea>) {
-    val scale = remember { mutableStateOf(1.5f) }
+    val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
     val areaColors = remember { areas.map { mutableStateOf(it.initialColor) } }
@@ -616,8 +614,8 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
             .background(Color(0xFFCFDF68))
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
-                    scale.value = (scale.value * zoom).coerceIn(1f, 5f)
-                    val adjustedPan = pan * scale.value
+                    scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
+                    val adjustedPan = pan * scale.floatValue
                     offset.value += adjustedPan + (centroid * (1 - zoom))
                 }
             }
@@ -632,8 +630,8 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                             if (area.label !in listOf("Background", "DarkedZone","Área de Alimentos Exterior")) {
                                 val transformedPoints = area.points.map { point ->
                                     Offset(
-                                        x = (point.x + area.initialOffset.x) * scale.value + offset.value.x,
-                                        y = (point.y + area.initialOffset.y) * scale.value + offset.value.y
+                                        x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
+                                        y = (point.y + area.initialOffset.y) * scale.floatValue + offset.value.y
                                     )
                                 }
                                 if (isPointInPolygon(tapOffset, transformedPoints)) {
@@ -653,8 +651,8 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 val path = Path().apply {
                     val transformedPoints = area.points.map { point ->
                         Offset(
-                            x = (point.x + area.initialOffset.x) * scale.value + offset.value.x,
-                            y = (point.y + area.initialOffset.y) * scale.value + offset.value.y
+                            x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
+                            y = (point.y + area.initialOffset.y) * scale.floatValue + offset.value.y
                         )
                     }
                     moveTo(transformedPoints.first().x, transformedPoints.first().y)
@@ -674,7 +672,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
         ) {
             FloatingActionButton(
                 onClick = {
-                    scale.value = (scale.value * 1.2f).coerceIn(1f, 5f)
+                    scale.floatValue = (scale.floatValue * 1.2f).coerceIn(1f, 5f)
                 },
                 modifier = Modifier.size(50.dp),
                 containerColor = Color.White
@@ -688,7 +686,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
 
             FloatingActionButton(
                 onClick = {
-                    scale.value = (scale.value / 1.2f).coerceIn(1f, 5f)
+                    scale.floatValue = (scale.floatValue / 1.2f).coerceIn(1f, 5f)
                 },
                 modifier = Modifier.size(50.dp),
                 containerColor = Color.White
@@ -706,9 +704,9 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
 @Composable
 fun PisoContent(piso: Int) {
     val areas = when (piso) {
-        0 -> piso1Areas() // Contenido del Piso 1
-        1 -> piso2Areas() // Contenido del Piso 2
-        2 -> piso3Areas() // Contenido del Piso 3
+        0 -> plantaBaja() // Contenido del Piso 1
+        1 -> sotano1() // Contenido del Piso 2
+        2 -> sotano2() // Contenido del Piso 3
         else -> emptyList()
     }
 
