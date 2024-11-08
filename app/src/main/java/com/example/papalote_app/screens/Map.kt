@@ -39,32 +39,41 @@ fun Map(navController: NavController) {
 
     // Estado para la pestaña seleccionada (representando los pisos)
     var selectedTabIndex by remember { mutableStateOf(0) }
-    val pisos = listOf("Piso 1", "Piso 2", "Piso 3")
+    val pisos = listOf("PB", "S1", "S2")
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Colocamos el TabRow en una capa superior usando zIndex
-        Box(modifier = Modifier.zIndex(1f)) {
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                containerColor = Color.White, // Color del TabRow
-                contentColor = Color.Black // Color de texto del Tab seleccionado
-            ) {
-                pisos.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = { Text(title) }
-                    )
-                }
-            }
-        }
-
         // Contenido de cada piso, que incluye el mapa interactivo
         Box(modifier = Modifier.fillMaxSize()) {
             when (selectedTabIndex) {
                 0 -> PisoContent(piso = 0) // Contenido del Piso 1
                 1 -> PisoContent(piso = 1) // Contenido del Piso 2
                 2 -> PisoContent(piso = 2) // Contenido del Piso 3
+            }
+        }
+
+        // TabRow en la parte inferior, centrado y pequeño
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.BottomCenter)
+        ) {
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = Color.White,
+                contentColor = Color.Black,
+                modifier = Modifier
+                    .width(200.dp) // Ancho del TabRow reducido
+                    .height(48.dp) // Altura del TabRow ajustada
+                    .align(Alignment.Center) // Centrado en la parte inferior
+            ) {
+                pisos.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = { Text(title, fontSize = 12.sp) }
+                    )
+                }
             }
         }
     }
@@ -347,6 +356,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xFFCFDF68))
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
                     scale.value = (scale.value * zoom).coerceIn(1f, 5f)
@@ -358,7 +368,6 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFCFDF68))
                 .pointerInput(Unit) {
                     detectTapGestures { tapOffset ->
                         areas.forEachIndexed { index, area ->
@@ -410,7 +419,8 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 onClick = {
                     scale.value = (scale.value * 1.2f).coerceIn(1f, 5f)
                 },
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier.size(50.dp),
+                containerColor = Color.White
             ) {
                 Text("+", fontSize = 20.sp)
             }
@@ -419,7 +429,8 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 onClick = {
                     scale.value = (scale.value / 1.2f).coerceIn(1f, 5f)
                 },
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier.size(50.dp),
+                containerColor = Color.White
             ) {
                 Text("-", fontSize = 20.sp)
             }
