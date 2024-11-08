@@ -1,5 +1,7 @@
 package com.example.papalote_app.screens
 
+import com.example.papalote_app.R
+
 import androidx.compose.runtime.Composable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
@@ -7,6 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -418,7 +423,7 @@ fun piso3Areas(): List<PolygonArea> {
                 Offset(713f, 470f),
                 Offset(663f, 470f)
             ),
-            initialColor = Color(0xFF800080),
+            initialColor = Color(0xFF7946A4), //#7946A4
             label = "Baylab",
             onClick = { /* Acción para Baylab */ },
 //            initialOffset = Offset(90f, 1130f)
@@ -483,7 +488,7 @@ fun piso3Areas(): List<PolygonArea> {
                 Offset(667f, 473f),
                 Offset(618f, 487f)
             ),
-            initialColor = Color.Red,
+            initialColor = Color(0xFFFF311B),
             label = "Decidir",
             onClick = { /* Acción para Decidir */ },
 //            initialOffset = Offset(90f, 1130f)
@@ -534,7 +539,7 @@ fun piso3Areas(): List<PolygonArea> {
                 Offset(222f, 130f),
                 Offset(191f, 70f)
             ),
-            initialColor = Color.Cyan,
+            initialColor = Color(0xFFCCE9C6),
             label = "MegapantallaIMAX",
             onClick = { /* Acción para MegapantallaIMAX */ },
 //            initialOffset = Offset(90f, 1130f)
@@ -581,8 +586,8 @@ fun piso3Areas(): List<PolygonArea> {
                 Offset(664f, 540f),
                 Offset(655f, 560f)
             ),
-            initialColor = Color.DarkGray,
-            label = "DarkedZone2",
+            initialColor = Color(0xFFFFDA9B),
+            label = "Dinosaurios",
             onClick = { /* Acción visual sin clic */ },
 //            initialOffset = Offset(90f, 1130f)
             initialOffset = Offset(-60f, 400f)
@@ -616,7 +621,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                     detectTapGestures { tapOffset ->
                         areas.forEachIndexed { index, area ->
                             // Verifica si el área es decorativa y no debe reaccionar a clics
-                            if (area.label !in listOf("Background", "DarkedZone", "DarkedZone2","Área de Alimentos Exterior")) {
+                            if (area.label !in listOf("Background", "DarkedZone","Área de Alimentos Exterior")) {
                                 val transformedPoints = area.points.map { point ->
                                     Offset(
                                         x = (point.x + area.initialOffset.x) * scale.value + offset.value.x,
@@ -666,7 +671,11 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 modifier = Modifier.size(50.dp),
                 containerColor = Color.White
             ) {
-                Text("+", fontSize = 20.sp)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_zoom_in), // Asegúrate de que este recurso exista
+                    contentDescription = "Zoom In",
+                    tint = Color.Black
+                )
             }
 
             FloatingActionButton(
@@ -676,7 +685,11 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 modifier = Modifier.size(50.dp),
                 containerColor = Color.White
             ) {
-                Text("-", fontSize = 20.sp)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_zoom_out), // Asegúrate de que este recurso exista
+                    contentDescription = "Zoom Out",
+                    tint = Color.Black
+                )
             }
         }
     }
