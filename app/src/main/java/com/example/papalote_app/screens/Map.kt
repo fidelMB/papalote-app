@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,13 +40,22 @@ fun Map(navController: NavController) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val pisos = listOf("PB", "S1", "S2")
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFCFDF68)) // Fondo verde general
+    ) {
+
         // Contenido de cada piso, que incluye el mapa interactivo
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 56.dp) // Espacio para el header
+        ) {
             when (selectedTabIndex) {
-                0 -> PisoContent(piso = 0) // Contenido del Piso 1
-                1 -> PisoContent(piso = 1) // Contenido del Piso 2
-                2 -> PisoContent(piso = 2) // Contenido del Piso 3
+                0 -> PisoContent(piso = 0) // Contenido del Piso PB
+                1 -> PisoContent(piso = 1) // Contenido del Piso S1
+                2 -> PisoContent(piso = 2) // Contenido del Piso S2
             }
         }
 
@@ -381,7 +389,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                                 }
                                 if (isPointInPolygon(tapOffset, transformedPoints)) {
                                     coroutineScope.launch {
-                                        areaColors[index].value = Color.Green
+                                        areaColors[index].value = Color.Yellow
                                         delay(300)
                                         areaColors[index].value = area.initialColor
                                     }
