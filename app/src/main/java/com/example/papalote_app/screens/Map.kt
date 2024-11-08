@@ -108,25 +108,277 @@ fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
 
 fun piso1Areas(): List<PolygonArea> {
     return listOf(
+            PolygonArea(
+                points = listOf(
+                    Offset(393f, 330f),
+                    Offset(392f, 423f),
+                    Offset(379f, 423f),
+                    Offset(379f, 437f),
+                    Offset(392f, 438f),
+                    Offset(393f, 456f),
+                    Offset(703f, 456f),
+                    Offset(702f, 332f)
+                ),
+                initialColor = Color.Gray,
+                label = "Área de Alimentos Exterior",
+                onClick = { /* Acción para Área de Alimentos Exterior */ },
+                initialOffset = Offset(-60f, 400f)
+            ),
+            PolygonArea(
+            points = listOf(
+                Offset(404f, 388f),
+                Offset(404f, 399f),
+                Offset(467f, 399f),
+                Offset(467f, 453f),
+                Offset(527f, 452f),
+                Offset(527f, 428f),
+                Offset(569f, 426f),
+                Offset(570f, 453f),
+                Offset(628f, 452f),
+                Offset(629f, 400f),
+                Offset(691f, 397f),
+                Offset(691f, 387f),
+                Offset(629f, 387f),
+                Offset(629f, 333f),
+                Offset(468f, 332f),
+                Offset(467f, 385f)
+            ),
+            initialColor = Color.DarkGray,
+            label = "Área de Alimentos Interior",
+            onClick = { /* Acción para Área de Alimentos Interior */ },
+            initialOffset = Offset(-60f, 400f)
+        ),
         PolygonArea(
             points = listOf(
-                Offset(200f, 71f),
-                Offset(227f, 136f),
-                Offset(233f, 201f),
-                Offset(228f, 254f),
-                Offset(212f, 299f),
-                Offset(197f, 322f),
-                Offset(328f, 323f)
+                Offset(152f, 54f),
+                Offset(151f, 199f),
+                Offset(457f, 200f),
+                Offset(457f, 225f),
+                Offset(572f, 225f),
+                Offset(573f, 55f)
             ),
             initialColor = Color.Gray,
-            label = "Zona 1 - Piso 1",
-            onClick = { /* Acción para el área en Piso 1 */ }
-        ),
-        // Agrega más áreas específicas para el piso 1
+            label = "Área 2",
+            onClick = { /* Acción para Área 2 */ },
+            initialOffset = Offset(-60f, 400f)
+        )
     )
 }
 
 fun piso2Areas(): List<PolygonArea> {
+    return listOf(
+        PolygonArea(
+            points = listOf(
+                Offset(138f, 93f), Offset(531f, 89f), Offset(534f, 353f), Offset(822f, 415f),
+                Offset(850f, 577f), Offset(747f, 639f), Offset(664f, 801f), Offset(507f, 806f),
+                Offset(282f, 504f), Offset(55f, 499f), Offset(56f, 331f), Offset(150f, 331f),
+                Offset(151f, 291f), Offset(165f, 256f)
+            ),
+            initialColor = Color.Gray,
+            label = "Background",
+            onClick = { /* Acción para Background */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(655f, 411f), Offset(660f, 477f), Offset(676f, 490f), Offset(715f, 424f)
+            ),
+            initialColor = Color(0xFF489212),
+            label = "Energía",
+            onClick = { /* Acción para Energía */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(278f, 295f),
+                Offset(288f, 316f),
+                Offset(270f, 323f),
+                Offset(291f, 325f),
+                Offset(301f, 337f),
+                Offset(290f, 342f),
+                Offset(306f, 343f),
+                Offset(330f, 364f),
+                Offset(317f, 337f),
+                Offset(322f, 316f),
+                Offset(313f, 325f),
+                Offset(303f, 318f),
+                Offset(308f, 296f),
+                Offset(296f, 310f)
+            ),
+            initialColor = Color.Cyan,
+            label = "Monstruo de Aramberri",
+            onClick = { /* Acción para Energía */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(597f, 689f), Offset(597f, 773f), Offset(662f, 772f), Offset(710f, 681f),
+                Offset(708f, 665f), Offset(719f, 638f), Offset(647f, 676f), Offset(634f, 689f)
+            ),
+            initialColor = Color(0x55cdd0),
+            label = "Submarino",
+            onClick = { /* Acción para Submarino */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(164f, 361f), Offset(143f, 399f), Offset(94f, 399f), Offset(94f, 437f),
+                Offset(243f, 439f), Offset(244f, 375f), Offset(223f, 361f)
+            ),
+            initialColor = Color(0xFFCCE9C6),
+            label = "Tienda",
+            onClick = { /* Acción para Tienda */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(301f, 215f), Offset(391f, 339f), Offset(486f, 301f), Offset(526f, 301f),
+                Offset(523f, 130f)
+            ),
+            initialColor = Color(0xFFCCE9C6),
+            label = "Sala de Exposiciones Temporales",
+            onClick = { /* Acción para Sala de Exposiciones Temporales */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(264f, 222f), Offset(216f, 323f), Offset(223f, 340f), Offset(291f, 386f),
+                Offset(302f, 425f), Offset(369f, 483f), Offset(410f, 471f), Offset(265f, 326f),
+                Offset(264f, 314f), Offset(284f, 279f), Offset(294f, 280f), Offset(344f, 340f),
+                Offset(370f, 393f), Offset(431f, 464f), Offset(466f, 453f), Offset(298f, 213f)
+            ),
+            initialColor = Color.DarkGray,
+            label = "DarkedZone",
+            onClick = { /* Acción para DarkedZone */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(164f, 156f), Offset(176f, 218f), Offset(186f, 201f), Offset(178f, 132f)
+            ),
+            initialColor = Color.DarkGray,
+            label = "DarkedZone",
+            onClick = { /* Acción para DarkedZone Poly */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(232f, 333f), Offset(212f, 367f), Offset(237f, 362f)
+            ),
+            initialColor = Color(0xffff8d2f),//light orange
+            label = "Acceso al Museo",
+            onClick = { /* Acción para Acceso al Museo */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(286f, 88f), Offset(288f, 125f), Offset(385f, 124f), Offset(384f, 88f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area3",
+            onClick = { /* Acción para Area3 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(396f, 89f), Offset(398f, 114f), Offset(456f, 115f), Offset(456f, 89f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area7",
+            onClick = { /* Acción para Area7 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(152f, 88f), Offset(152f, 112f), Offset(252f, 111f), Offset(252f, 88f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Acceso IMAX",
+            onClick = { /* Acción para Acceso IMAX */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(80f, 358f), Offset(78f, 382f), Offset(99f, 383f), Offset(101f, 359f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area2",
+            onClick = { /* Acción para Area2 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(186f, 449f), Offset(186f, 472f), Offset(207f, 474f), Offset(207f, 452f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area2",
+            onClick = { /* Acción para Area2 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(111f, 362f), Offset(110f, 378f), Offset(127f, 379f), Offset(129f, 362f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area8",
+            onClick = { /* Acción para Area8 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(402f, 126f), Offset(402f, 141f), Offset(415f, 141f), Offset(415f, 127f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area4",
+            onClick = { /* Acción para Area4 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(191f, 139f), Offset(190f, 164f), Offset(209f, 163f), Offset(210f, 142f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area5",
+            onClick = { /* Acción para Area5 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(195f, 190f), Offset(194f, 209f), Offset(216f, 209f), Offset(216f, 189f)
+            ),
+            initialColor = Color(0xFFED484B),// LightRed
+            label = "Area6",
+            onClick = { /* Acción para Area6 */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(395f, 344f), Offset(468f, 454f), Offset(414f, 479f), Offset(429f, 537f),
+                Offset(441f, 527f), Offset(582f, 479f), Offset(667f, 524f), Offset(684f, 524f),
+                Offset(700f, 510f), Offset(727f, 465f), Offset(775f, 459f), Offset(793f, 557f),
+                Offset(827f, 580f), Offset(839f, 563f), Offset(816f, 434f), Offset(728f, 413f),
+                Offset(681f, 491f), Offset(658f, 482f), Offset(649f, 411f), Offset(531f, 382f),
+                Offset(523f, 373f), Offset(525f, 308f), Offset(486f, 305f)
+            ),
+            initialColor = Color(0xFF8eca48), //DarkGreen
+            label = "DarkedZone",
+            onClick = { /* Acción para DarkedZone */ },
+            initialOffset = Offset(20f, 400f)
+        ),
+        PolygonArea(
+            points = listOf(
+                Offset(330f, 543f), Offset(427f, 544f), Offset(426f, 557f), Offset(539f, 685f),
+                Offset(592f, 690f), Offset(593f, 775f), Offset(502f, 774f), Offset(484f, 766f)
+            ),
+            initialColor = Color(0xFF286EBB),
+            label = "DarkedZone",
+            onClick = { /* Acción para DarkedZone */ },
+            initialOffset = Offset(20f, 400f)
+        )
+    )
+}
+
+fun piso3Areas(): List<PolygonArea> {
     return listOf(
         PolygonArea(
             points = listOf(
@@ -338,22 +590,6 @@ fun piso2Areas(): List<PolygonArea> {
     )
 }
 
-fun piso3Areas(): List<PolygonArea> {
-    return listOf(
-        PolygonArea(
-            points = listOf(
-                Offset(670f, 473f),
-                Offset(696f, 524f),
-                Offset(766f, 527f)
-            ),
-            initialColor = Color.Cyan,
-            label = "Zona 1 - Piso 3",
-            onClick = { /* Acción para el área en Piso 3 */ }
-        ),
-        // Agrega más áreas específicas para el piso 3
-    )
-}
-
 @Composable
 fun MapaInteractivo(areas: List<PolygonArea>) {
     val scale = remember { mutableStateOf(1.5f) }
@@ -380,7 +616,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                     detectTapGestures { tapOffset ->
                         areas.forEachIndexed { index, area ->
                             // Verifica si el área es decorativa y no debe reaccionar a clics
-                            if (area.label !in listOf("Background", "DarkedZone", "DarkedZone2")) {
+                            if (area.label !in listOf("Background", "DarkedZone", "DarkedZone2","Área de Alimentos Exterior")) {
                                 val transformedPoints = area.points.map { point ->
                                     Offset(
                                         x = (point.x + area.initialOffset.x) * scale.value + offset.value.x,
