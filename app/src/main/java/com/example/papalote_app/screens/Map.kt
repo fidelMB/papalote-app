@@ -110,10 +110,11 @@ fun Map(navController: NavController) {
 
 //PopupWindow con las actividades
 fun showPopupWindow(context: Context) {
+
     val popupLayout = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         setBackgroundColor(Color.White.toArgb())
-        setPadding(50,50,50,50)
+        setPadding(50, 50, 50, 50)
     }
 
     //Crear el contenido del PopupWindow
@@ -130,6 +131,19 @@ fun showPopupWindow(context: Context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         true // Permitir cerrar el popup al hacer clic fuera de él
     )
+
+    val title = TextView(context).apply {
+        text = "Titulo del PopUp"
+        textSize = 18f
+        gravity = Gravity.CENTER
+    }
+
+    val description = TextView(context).apply {
+        text = "Descripcion del area"
+        textSize = 16f
+        gravity = Gravity.CENTER
+        setPadding(16, 16, 16, 16)
+    }
 
     // Mostrar el PopupWindow en el centro de la pantalla
     popupWindow.showAtLocation(popupLayout.rootView, Gravity.CENTER, 0,0)
