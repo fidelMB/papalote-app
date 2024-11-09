@@ -1,5 +1,11 @@
 package com.example.papalote_app.screens
 
+import android.content.Context
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.TextView
 import com.example.papalote_app.R
 
 import androidx.compose.runtime.Composable
@@ -18,8 +24,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -37,6 +46,7 @@ data class PolygonArea(
 
 @Composable
 fun Map(navController: NavController) {
+
     BackHandler {
         navController.popBackStack()
     }
@@ -98,6 +108,34 @@ fun Map(navController: NavController) {
     }
 }
 
+//PopupWindow con las actividades
+fun showPopupWindow(context: Context) {
+    val popupLayout = LinearLayout(context).apply {
+        orientation = LinearLayout.VERTICAL
+        setBackgroundColor(Color.White.toArgb())
+        setPadding(50,50,50,50)
+    }
+
+    //Crear el contenido del PopupWindow
+    val popupText = TextView(context).apply {
+        text = "Contenido del popUp"
+        setTextColor(Color.Black.toArgb())
+    }
+    popupLayout.addView(popupText)
+
+    // Crear el PopupWindow
+    val popupWindow = PopupWindow(
+        popupLayout,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        true // Permitir cerrar el popup al hacer clic fuera de él
+    )
+
+    // Mostrar el PopupWindow en el centro de la pantalla
+    popupWindow.showAtLocation(popupLayout.rootView, Gravity.CENTER, 0,0)
+}
+
+
 
 // Función para verificar si un punto está dentro de un polígono
 fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
@@ -132,7 +170,7 @@ fun plantaBaja(): List<PolygonArea> {
                 ),
                 initialColor = Color.Gray,
                 label = "Área de Alimentos Exterior",
-                onClick = { /* Acción para Área de Alimentos Exterior */ },
+                onClick = {  },
                 initialOffset = Offset(-60f, 400f)
             ),
             PolygonArea(
@@ -156,7 +194,7 @@ fun plantaBaja(): List<PolygonArea> {
             ),
             initialColor = Color.DarkGray,
             label = "Área de Alimentos Interior",
-            onClick = { /* Acción para Área de Alimentos Interior */ },
+            onClick = {  },
             initialOffset = Offset(-60f, 400f)
         ),
         PolygonArea(
@@ -170,7 +208,7 @@ fun plantaBaja(): List<PolygonArea> {
             ),
             initialColor = Color.Gray,
             label = "Área 2",
-            onClick = { /* Acción para Área 2 */ },
+            onClick = {  },
             initialOffset = Offset(-60f, 400f)
         )
     )
@@ -602,7 +640,7 @@ fun sotano2(): List<PolygonArea> {
 }
 
 @Composable
-fun MapaInteractivo(areas: List<PolygonArea>) {
+fun MapaInteractivo(areas: List<PolygonArea>, context: Context) {
     val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
@@ -641,6 +679,8 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                                         areaColors[index].value = area.initialColor
                                     }
                                     area.onClick()
+                                    // Llamar a la función del popup, pasando el contexto como parámetro
+                                    showPopupWindow(context)
                                 }
                             }
                         }
@@ -710,9 +750,11 @@ fun PisoContent(piso: Int) {
         else -> emptyList()
     }
 
+    val context = LocalContext.current
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Llama a la función que contiene la lógica de mapa y polígonos con las áreas del piso actual
-        MapaInteractivo(areas = areas)
+        MapaInteractivo(areas = areas, context = context)
     }
 }
 
