@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.papalote_app.components.NavBar
+import com.example.papalote_app.model.UserProfile
 import com.example.papalote_app.navigation.Screen
 import com.example.papalote_app.screens.Events
 import com.example.papalote_app.screens.Favorites
@@ -67,7 +68,8 @@ fun MainNavigation(modifier: Modifier = Modifier, navController: NavHostControll
         }
 
         composable(Screen.Profile.route) {
-            Profile(navController = navController)
+            val user = UserProfile(name = "John Doe", email = "johndoe@example.com", phone = "123-456-7890", url="img")
+            Profile(navController = navController, user=user)
         }
     }
 }
