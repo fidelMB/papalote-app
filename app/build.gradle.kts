@@ -2,7 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
     id("kotlin-parcelize")
+    
 }
 
 android {
@@ -37,6 +39,8 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
+        dataBinding = true
     }
 }
 
@@ -45,6 +49,8 @@ dependencies {
 
     implementation("io.coil-kt.coil3:coil-compose:3.0.1")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.1")
+
+    implementation( "org.jetbrains.kotlin:kotlin-parcelize-runtime:1.4.20")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
