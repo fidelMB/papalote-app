@@ -9,6 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.papalote_app.R
 import com.example.papalote_app.components.AuthButton
@@ -28,15 +30,23 @@ fun SignIn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo",
             modifier = Modifier
-                .size(120.dp)
-                .padding(bottom = 24.dp)
+                .size(300.dp) // Reduced size for a more compact layout
+                .padding(bottom = 8.dp) // Adjusted padding
+        )
+
+        Text(
+            text = "Iniciar Sesión",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                color = Color(0xFF1D1B20),
+                fontWeight = FontWeight(600)
+            ),
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
         AuthTextField(
@@ -56,15 +66,7 @@ fun SignIn(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        TextButton(
-            onClick = onForgotPassword,
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text(
-                "¿Olvidaste tu contraseña?",
-                color = Color(0xFFDBE78E)
-            )
-        }
+
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -80,7 +82,9 @@ fun SignIn(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+
         ) {
             Text("¿No tienes cuenta? ")
             TextButton(onClick = onNavigateToRegister) {
@@ -89,6 +93,15 @@ fun SignIn(
                     color = Color(0xFFDBE78E)
                 )
             }
+        }
+
+        TextButton(
+            onClick = onForgotPassword
+        ) {
+            Text(
+                "¿Olvidaste tu contraseña?",
+                color = Color(0xFFDBE78E)
+            )
         }
     }
 }

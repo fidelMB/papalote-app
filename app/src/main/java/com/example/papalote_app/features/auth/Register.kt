@@ -1,6 +1,7 @@
 // feature/auth/Register.kt
 package com.example.papalote_app.features.auth
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.papalote_app.R
 import com.example.papalote_app.components.AuthButton
@@ -29,6 +31,7 @@ fun Register(
     onNavigateToLogin: () -> Unit,
     isLoading: Boolean
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -42,6 +45,15 @@ fun Register(
             modifier = Modifier
                 .size(120.dp)
                 .padding(bottom = 24.dp)
+        )
+
+        Text(
+            text = "Regístrate",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                color = Color(0xFF1D1B20),
+                fontWeight = FontWeight(600)
+            ),
+            modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
         )
 
         AuthTextField(
@@ -103,7 +115,8 @@ fun Register(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text("¿Ya tienes cuenta? ")
             TextButton(onClick = onNavigateToLogin) {

@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.papalote_app.model.UserProfile
 import com.example.papalote_app.screens.*
 
 @Composable
@@ -36,9 +37,11 @@ fun MainNavigation(
         }
 
         composable(Screen.Profile.route) {
+            val user = UserProfile(name = "John Doe", email = "johndoe@example.com", phone = "123-456-7890", url="img")
             Profile(
                 navController = navController,
-                onSignOut = onSignOut
+                onSignOut = onSignOut,
+                user = user
             )
         }
     }
