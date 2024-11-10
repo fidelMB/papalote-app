@@ -6,8 +6,10 @@ import com.example.papalote_app.components.PopUpComponentEvents
 
 import androidx.compose.runtime.Composable
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -22,9 +24,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -107,6 +111,20 @@ fun Map(navController: NavController) {
     }
 }
 
+
+//Funcion para poder ver un preview del popup
+@Preview(showBackground = true)
+@Composable
+fun InfoPopupPreview() {
+    InfoPopup(
+        showPopup = true, // Set to true to display the popup in the preview
+        title = "Sample Title",
+        message = "This is a sample message.",
+        options = listOf("Option 1", "Option 2", "Option 3"),
+        onDismiss = { /* No-op for preview */ }
+    )
+}
+
 @Composable
 fun InfoPopup(
     showPopup: Boolean,
@@ -115,27 +133,58 @@ fun InfoPopup(
     options: List<String>,
     onDismiss: () -> Unit
 ) {
+    var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
+
     if (showPopup) {
         Dialog(
             onDismissRequest = onDismiss,
-            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
         ) {
-            Card(
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 8.dp,
-                    pressedElevation = 4.dp,
-                    focusedElevation = 4.dp
-                ),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = title, style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = message, style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    options.forEach { option ->
-                        Button(onClick = { /* Handle option click */ }) {
-                            Text(text = option)
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Card(
+
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 8.dp,
+                        pressedElevation = 4.dp,
+                        focusedElevation = 4.dp
+                    ),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
+                        .height(350.dp)
+                ) {
+                    Column(modifier = Modifier
+                        .padding(16.dp)
+                    ) {
+                        // ... title and message ...
+                        options.forEachIndexed { index, option ->
+                            AnimatedVisibility(visible = expandedOptionIndex == null || expandedOptionIndex == index) {
+                                Column {
+                                    Button(onClick = {
+                                        expandedOptionIndex =
+                                            if (expandedOptionIndex == index) null else index
+                                    },
+                                        modifier = Modifier
+                                            .fillMaxWidth() // Fill the width of the popup
+                                        ,colors = ButtonDefaults.buttonColors(Color.Transparent)
+                                        ,contentPadding = PaddingValues(0.dp)
+                                        ,shape = RectangleShape,
+                                        ) {
+                                        Text(text = option, color = Color.Black)
+                                    }
+                                    AnimatedVisibility(visible = expandedOptionIndex == index) {
+                                        Text(
+                                            "Relieve",
+                                            modifier = Modifier.padding(start = 16.dp)
+                                        )
+                                        Text(
+                                            "Crea divertidas figuras de la naturaleza\u2028en nuestra pared de clavos."
+                                            ,modifier = Modifier.padding(start = 16.dp)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -758,7 +807,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
             showPopup = showPopup,
             title = "Details for $selectedAreaLabel",
             message = "Here's more information about the selected area.",
-            options = listOf("Option 1", "Option 2", "Option 3"),
+            options = listOf("Expreso", "Soy", "Comprendo"),
             onDismiss = { showPopup = false }
         )
     }
