@@ -2,7 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("kotlin-parcelize")
+    
     id("com.google.gms.google-services")
+
 }
 
 android {
@@ -37,12 +41,18 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
+        dataBinding = true
     }
 }
 
 dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    implementation("io.coil-kt.coil3:coil-compose:3.0.1")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.1")
+
+    implementation( "org.jetbrains.kotlin:kotlin-parcelize-runtime:1.4.20")
     implementation(platform("com.google.firebase:firebase-bom:33.5.1")) // Check for latest version
     implementation("com.google.firebase:firebase-auth-ktx:23.0.0")  // Esta dependencia se utiliza para la autenticación
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.0")  // Esta dependendencia se utiliza para la firestore database

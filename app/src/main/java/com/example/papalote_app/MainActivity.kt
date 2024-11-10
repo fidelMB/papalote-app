@@ -17,6 +17,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.papalote_app.components.NavBar
+import com.example.papalote_app.model.UserProfile
+import com.example.papalote_app.navigation.Screen
+import com.example.papalote_app.screens.Events
+import com.example.papalote_app.screens.Favorites
+import com.example.papalote_app.screens.Map
+import com.example.papalote_app.screens.Profile
+import com.example.papalote_app.screens.QR
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -84,3 +97,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
