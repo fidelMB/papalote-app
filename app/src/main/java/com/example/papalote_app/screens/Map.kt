@@ -1,12 +1,8 @@
 package com.example.papalote_app.screens
 
 import android.content.Context
-import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.TextView
 import com.example.papalote_app.R
+import com.example.papalote_app.components.PopUpComponentEvents
 
 import androidx.compose.runtime.Composable
 import androidx.activity.compose.BackHandler
@@ -18,19 +14,22 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -108,45 +107,41 @@ fun Map(navController: NavController) {
     }
 }
 
-//PopupWindow con las actividades
-fun showPopupWindow(context: Context) {
-
-    val popupLayout = LinearLayout(context).apply {
-        orientation = LinearLayout.VERTICAL
-        setBackgroundColor(Color.White.toArgb())
-        setPadding(50, 50, 50, 50)
+@Composable
+fun InfoPopup(
+    showPopup: Boolean,
+    title: String,
+    message: String,
+    options: List<String>,
+    onDismiss: () -> Unit
+) {
+    if (showPopup) {
+        Dialog(
+            onDismissRequest = onDismiss,
+            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+        ) {
+            Card(
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 8.dp,
+                    pressedElevation = 4.dp,
+                    focusedElevation = 4.dp
+                ),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = title, style = MaterialTheme.typography.bodyLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = message, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    options.forEach { option ->
+                        Button(onClick = { /* Handle option click */ }) {
+                            Text(text = option)
+                        }
+                    }
+                }
+            }
+        }
     }
-
-    //Crear el contenido del PopupWindow
-    val popupText = TextView(context).apply {
-        text = "Contenido del popUp"
-        setTextColor(Color.Black.toArgb())
-    }
-    popupLayout.addView(popupText)
-
-    // Crear el PopupWindow
-    val popupWindow = PopupWindow(
-        popupLayout,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        true // Permitir cerrar el popup al hacer clic fuera de él
-    )
-
-    val title = TextView(context).apply {
-        text = "Titulo del PopUp"
-        textSize = 18f
-        gravity = Gravity.CENTER
-    }
-
-    val description = TextView(context).apply {
-        text = "Descripcion del area"
-        textSize = 16f
-        gravity = Gravity.CENTER
-        setPadding(16, 16, 16, 16)
-    }
-
-    // Mostrar el PopupWindow en el centro de la pantalla
-    popupWindow.showAtLocation(popupLayout.rootView, Gravity.CENTER, 0,0)
 }
 
 
@@ -654,11 +649,14 @@ fun sotano2(): List<PolygonArea> {
 }
 
 @Composable
-fun MapaInteractivo(areas: List<PolygonArea>, context: Context) {
+fun MapaInteractivo(areas: List<PolygonArea>) {
     val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
     val areaColors = remember { areas.map { mutableStateOf(it.initialColor) } }
+
+    var showPopup by remember { mutableStateOf(false) }
+    var selectedAreaLabel by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -679,7 +677,12 @@ fun MapaInteractivo(areas: List<PolygonArea>, context: Context) {
                     detectTapGestures { tapOffset ->
                         areas.forEachIndexed { index, area ->
                             // Verifica si el área es decorativa y no debe reaccionar a clics
-                            if (area.label !in listOf("Background", "DarkedZone","Área de Alimentos Exterior")) {
+                            if (area.label !in listOf(
+                                    "Background",
+                                    "DarkedZone",
+                                    "Área de Alimentos Exterior"
+                                )
+                            ) {
                                 val transformedPoints = area.points.map { point ->
                                     Offset(
                                         x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
@@ -692,9 +695,8 @@ fun MapaInteractivo(areas: List<PolygonArea>, context: Context) {
                                         delay(300)
                                         areaColors[index].value = area.initialColor
                                     }
-                                    area.onClick()
-                                    // Llamar a la función del popup, pasando el contexto como parámetro
-                                    showPopupWindow(context)
+                                    showPopup = true
+                                    selectedAreaLabel = area.label
                                 }
                             }
                         }
@@ -752,6 +754,13 @@ fun MapaInteractivo(areas: List<PolygonArea>, context: Context) {
                 )
             }
         }
+        InfoPopup(
+            showPopup = showPopup,
+            title = "Details for $selectedAreaLabel",
+            message = "Here's more information about the selected area.",
+            options = listOf("Option 1", "Option 2", "Option 3"),
+            onDismiss = { showPopup = false }
+        )
     }
 }
 
@@ -764,11 +773,9 @@ fun PisoContent(piso: Int) {
         else -> emptyList()
     }
 
-    val context = LocalContext.current
-
     Box(modifier = Modifier.fillMaxSize()) {
         // Llama a la función que contiene la lógica de mapa y polígonos con las áreas del piso actual
-        MapaInteractivo(areas = areas, context = context)
+        MapaInteractivo(areas = areas)
     }
 }
 
