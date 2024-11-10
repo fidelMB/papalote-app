@@ -1,6 +1,4 @@
 package com.example.papalote_app.screens
-
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,10 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,15 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.papalote_app.R
 import com.example.papalote_app.model.UserProfile
 
 
 @Composable
-fun Profile(navController: NavController, user: UserProfile) {
+fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,21 +52,21 @@ fun Profile(navController: NavController, user: UserProfile) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            Text(
+                text = "Perfil",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    color = Color(0xFF1D1B20),
+                    fontWeight = FontWeight(600)
+                ),
+                modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
+            )
+
             // Main content
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 20.dp)
             ) {
-                Text(
-                    text = "Perfil",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
-                )
-
                 // Profile Image
                 Box(
                     modifier = Modifier
@@ -105,7 +97,7 @@ fun Profile(navController: NavController, user: UserProfile) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Change profile picture",
-                            tint = Color.Black,
+                            tint = Color(0XFF5C631D),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -116,7 +108,8 @@ fun Profile(navController: NavController, user: UserProfile) {
                     text = user.name,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF1D1B20)
                     ),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
@@ -154,7 +147,7 @@ fun Profile(navController: NavController, user: UserProfile) {
 
                 // Logout Button
                 Button(
-                    onClick = { /* Handle logout */ },
+                    onClick = onSignOut,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 24.dp),
@@ -171,12 +164,12 @@ fun Profile(navController: NavController, user: UserProfile) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                             contentDescription = "Logout",
-                            tint = Color.Black
+                            tint = Color(0XFF5C631D)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Cerrar sesión",
-                            color = Color.Black
+                            color = Color(0XFF5C631D)
                         )
                     }
                 }
@@ -189,5 +182,6 @@ fun getDrawableResourceId(resourceName: String): Int {
     return when (resourceName) {
         "img" -> R.drawable.img
         else -> R.drawable.img // Use the same image if you do not have a default one
+
     }
 }
