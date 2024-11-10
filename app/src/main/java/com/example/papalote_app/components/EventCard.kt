@@ -41,8 +41,8 @@ fun EventCard(event: Event = getEvents()[1]) {
         shape = RoundedCornerShape(corner = CornerSize(12.dp)),
         modifier = Modifier
             .fillMaxWidth()
-            .height(145.dp)
-            .padding(10.dp, 16.dp, 10.dp, 16.dp),
+            .height(110.dp)
+            .padding(16.dp, 8.dp, 16.dp, 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),
@@ -51,13 +51,12 @@ fun EventCard(event: Event = getEvents()[1]) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
-
         ) {
             Surface(
                 shape = RoundedCornerShape(12.dp, 0.dp, 0.dp, 12.dp),
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(80.dp)
+                    .width(75.dp)
             ) {
                 AsyncImage(
                     model = event.image,
@@ -73,23 +72,24 @@ fun EventCard(event: Event = getEvents()[1]) {
             ) {
                 Text(
                     text = event.date.uppercase(),
-                    style = MaterialTheme.typography.labelMedium.copy(
+                    style = MaterialTheme.typography.labelSmall.copy( // Smaller text size
                         color = Color(0xFF4A662C),
                         fontWeight = FontWeight(600)
                     )
                 )
                 Text(
                     text = event.name,
-                    style = MaterialTheme.typography.titleMedium.copy(
+                    style = MaterialTheme.typography.titleSmall.copy( // Smaller text size
                         color = Color(0xFF1D1B20),
                         fontWeight = FontWeight(500)
                     )
                 )
                 Text(
                     text = event.zone,
-                    style = MaterialTheme.typography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodySmall.copy( // Smaller text size
                         color = Color(0xFF615D67),
-                        fontWeight = FontWeight(400)                    )
+                        fontWeight = FontWeight(400)
+                    )
                 )
             }
 
@@ -98,9 +98,9 @@ fun EventCard(event: Event = getEvents()[1]) {
                 contentDescription = "Notification",
                 tint = Color.Black,
                 modifier = Modifier
-                    .size(24.dp)
-                    .padding(end = 8.dp)
+                    .size(40.dp)
                     .align(Alignment.CenterVertically)
+                    .padding(end = 20.dp)
             )
         }
     }
