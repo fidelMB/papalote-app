@@ -31,6 +31,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -51,7 +59,7 @@ import com.example.papalote_app.model.UserProfile
 
 
 @Composable
-fun Profile(navController: NavController, user: UserProfile) {
+fun Profile(navController: NavController, user: UserProfile, onSignout: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -154,7 +162,7 @@ fun Profile(navController: NavController, user: UserProfile) {
 
                 // Logout Button
                 Button(
-                    onClick = { /* Handle logout */ },
+                    onClick = { onSignOut },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 24.dp),
@@ -189,5 +197,6 @@ fun getDrawableResourceId(resourceName: String): Int {
     return when (resourceName) {
         "img" -> R.drawable.img
         else -> R.drawable.img // Use the same image if you do not have a default one
+
     }
 }
