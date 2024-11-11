@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -133,6 +136,13 @@ fun InfoPopup(
     options: List<String>,
     onDismiss: () -> Unit
 ) {
+
+    val activityImage = painterResource(id = R.drawable.media)
+    val heatIcon = painterResource(id = R.drawable.favorite)
+    val thumbupIcon = painterResource(id = R.drawable.thumb_up)
+    val thumbdownIcon = painterResource(id = R.drawable.thumb_down)
+    val activityAreaIcon = painterResource(id = R.drawable.expreso_1)
+
     var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
 
     if (showPopup) {
@@ -152,36 +162,111 @@ fun InfoPopup(
                         .padding(16.dp)
                         .fillMaxWidth()
                         .align(Alignment.BottomEnd)
-                        .height(350.dp)
+                        .height(400.dp)
                 ) {
                     Column(modifier = Modifier
-                        .padding(16.dp)
                     ) {
                         // ... title and message ...
                         options.forEachIndexed { index, option ->
                             AnimatedVisibility(visible = expandedOptionIndex == null || expandedOptionIndex == index) {
                                 Column {
-                                    Button(onClick = {
+                                    Button(
+                                        onClick = {
                                         expandedOptionIndex =
-                                            if (expandedOptionIndex == index) null else index
-                                    },
-                                        modifier = Modifier
+                                            if (expandedOptionIndex == index) null else index }
+                                        ,modifier = Modifier
                                             .fillMaxWidth() // Fill the width of the popup
+                                            .height(71.dp) // Set the height of the button)
                                         ,colors = ButtonDefaults.buttonColors(Color.Transparent)
                                         ,contentPadding = PaddingValues(0.dp)
-                                        ,shape = RectangleShape,
+                                        ,shape = RectangleShape
                                         ) {
-                                        Text(text = option, color = Color.Black)
+                                        Column {
+                                            Row(
+                                                horizontalArrangement = Arrangement.Start,
+                                                modifier = Modifier.padding(start = 16.dp)
+                                            ) {
+                                                Column {
+                                                    Image(
+                                                        painter = activityAreaIcon,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(40.dp)
+                                                    )
+                                                }
+                                                Column(modifier = Modifier.padding(start = 8.dp)) {
+                                                    Row {
+                                                        Text(
+                                                            text = option,
+                                                            color = Color.Black,
+                                                            fontSize = 16.sp,
+                                                            textAlign = TextAlign.Center,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    }
+                                                    Row {
+                                                        Text("Zona", color = Color.Black)
+                                                    }
+                                                }
+                                            }
+                                            Row (modifier = Modifier.width(400.dp)) {}
+                                        }
                                     }
                                     AnimatedVisibility(visible = expandedOptionIndex == index) {
-                                        Text(
-                                            "Relieve",
-                                            modifier = Modifier.padding(start = 16.dp)
-                                        )
-                                        Text(
-                                            "Crea divertidas figuras de la naturaleza\u2028en nuestra pared de clavos."
-                                            ,modifier = Modifier.padding(start = 16.dp)
-                                        )
+                                        Box {
+                                            Column {
+                                                Row {
+                                                    Image(
+                                                        painter = activityImage,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.width(400.dp).height(188.dp)
+                                                    )
+                                                }
+                                                Row (modifier = Modifier.padding(top = 20.dp)) {
+                                                    Text(
+                                                        text = "Relieve",
+                                                        modifier = Modifier.padding(start = 16.dp),
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                                Row {
+                                                    Text(
+                                                        text = "Crea divertidas figuras de la naturaleza en nuestra pared de clavos.",
+                                                        modifier = Modifier.padding(start = 16.dp)
+                                                    )
+                                                }
+                                                Column { // Column with images and button
+                                                    Row( // Row for images
+                                                        verticalAlignment = Alignment.CenterVertically, // Align images vertically
+                                                        modifier = Modifier.padding(start = 16.dp) // Add padding to the start
+                                                    ) {
+                                                        Image(
+                                                            painter = heatIcon,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(24.dp) // Set size for images
+                                                        )
+                                                        Spacer(modifier = Modifier.width(8.dp)) // Add space between images
+                                                        Image(
+                                                            painter = thumbupIcon,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(24.dp)
+                                                        )
+                                                        Spacer(modifier = Modifier.width(8.dp))
+                                                        Image(
+                                                            painter = thumbdownIcon,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(24.dp)
+                                                        )
+                                                        Spacer(modifier = Modifier.padding(start = 180.dp)) // Add space between images and button
+                                                        Button(
+                                                            onClick = {},
+                                                            colors = ButtonDefaults.buttonColors(Color.Yellow)
+                                                        ) {
+                                                            Text("Listo", color = Color.Green)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
