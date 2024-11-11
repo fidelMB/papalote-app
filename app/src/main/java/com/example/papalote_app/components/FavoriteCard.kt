@@ -58,7 +58,7 @@ fun FavoriteCard(activity: Activity = getActivities()[1]) {
                 AsyncImage(
                     model = activity.image,
                     contentDescription = "Activity Image",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.FillBounds
                 )
             }
 

@@ -13,13 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.papalote_app.components.FavoriteCard
 import com.example.papalote_app.model.getActivities
 
 @Composable
-fun Favorites(navController: NavController) {
+@Preview
+fun Favorites() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -35,12 +37,11 @@ fun Favorites(navController: NavController) {
                 ),
                 modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
             )
-        }
-        LazyColumn {
-            items(items = getActivities()) { activity ->
-                FavoriteCard(activity)
+            LazyColumn {
+                items(items = getActivities()) { activity ->
+                    FavoriteCard(activity)
+                }
             }
-
         }
     }
 }
