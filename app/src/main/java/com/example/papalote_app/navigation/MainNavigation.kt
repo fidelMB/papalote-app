@@ -33,7 +33,7 @@ fun MainNavigation(
         }
 
         composable(Screen.Favorites.route) {
-            Favorites(navController = navController)
+            Favorites()
         }
 
         composable(Screen.Profile.route) {
