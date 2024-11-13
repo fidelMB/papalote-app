@@ -64,7 +64,7 @@ fun Map(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFCFDF68)) // Fondo verde general
+            .background(Color(0xFFC4D600)) // Fondo verde general
     ) {
 
         // Contenido de cada piso, que incluye el mapa interactivo
@@ -552,7 +552,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(681f, 491f), Offset(658f, 482f), Offset(649f, 411f), Offset(531f, 382f),
                 Offset(523f, 373f), Offset(525f, 308f), Offset(486f, 305f)
             ),
-            initialColor = Color(0xFF8eca48), //DarkGreen
+            initialColor = Color.DarkGray, //DarkGreen
             label = "DarkedZone",
             onClick = { /* Acción para DarkedZone */ },
             initialOffset = Offset(20f, 400f)
@@ -562,7 +562,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(330f, 543f), Offset(427f, 544f), Offset(426f, 557f), Offset(539f, 685f),
                 Offset(592f, 690f), Offset(593f, 775f), Offset(502f, 774f), Offset(484f, 766f)
             ),
-            initialColor = Color(0xFF286EBB),
+            initialColor = Color.DarkGray,
             label = "DarkedZone",
             onClick = { /* Acción para DarkedZone */ },
             initialOffset = Offset(20f, 400f)
@@ -795,7 +795,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFCFDF68))
+            .background(Color(0xFFC4D600)) // Fondo Mapa interactivo
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
                     scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
@@ -854,40 +854,40 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
         }
 
         // Botones de Zoom In y Zoom Out en la parte inferior derecha
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            FloatingActionButton(
-                onClick = {
-                    scale.floatValue = (scale.floatValue * 1.2f).coerceIn(1f, 5f)
-                },
-                modifier = Modifier.size(50.dp),
-                containerColor = Color.White
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_zoom_in), // Asegúrate de que este recurso exista
-                    contentDescription = "Zoom In",
-                    tint = Color.Black
-                )
-            }
-
-            FloatingActionButton(
-                onClick = {
-                    scale.floatValue = (scale.floatValue / 1.2f).coerceIn(1f, 5f)
-                },
-                modifier = Modifier.size(50.dp),
-                containerColor = Color.White
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_zoom_out), // Asegúrate de que este recurso exista
-                    contentDescription = "Zoom Out",
-                    tint = Color.Black
-                )
-            }
-        }
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomEnd)
+//                .padding(16.dp),
+//            verticalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            FloatingActionButton(
+//                onClick = {
+//                    scale.floatValue = (scale.floatValue * 1.2f).coerceIn(1f, 5f)
+//                },
+//                modifier = Modifier.size(50.dp),
+//                containerColor = Color.White
+//            ) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.ic_zoom_in), // Asegúrate de que este recurso exista
+//                    contentDescription = "Zoom In",
+//                    tint = Color.Black
+//                )
+//            }
+//
+//            FloatingActionButton(
+//                onClick = {
+//                    scale.floatValue = (scale.floatValue / 1.2f).coerceIn(1f, 5f)
+//                },
+//                modifier = Modifier.size(50.dp),
+//                containerColor = Color.White
+//            ) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.ic_zoom_out), // Asegúrate de que este recurso exista
+//                    contentDescription = "Zoom Out",
+//                    tint = Color.Black
+//                )
+//            }
+//        }
         InfoPopup(
             showPopup = showPopup,
             title = "Details for $selectedAreaLabel",
