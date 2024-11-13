@@ -3,6 +3,7 @@ package com.example.papalote_app.features.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.utils.Constants
 import com.example.papalote_app.utils.ValidationResult
 import com.example.papalote_app.utils.Validators
@@ -13,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.auth.User
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +32,9 @@ class AuthViewModel : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthUiState>(AuthUiState.Initial)
     val authState: StateFlow<AuthUiState> = _authState
+
+    private var _userData: UserData? = null
+    val userData: UserData? get() = _userData
 
     init {
         checkAuthState()
@@ -116,6 +121,8 @@ class AuthViewModel : ViewModel() {
                 _authState.value = AuthUiState.Loading
                 auth.signInWithEmailAndPassword(email, password).await()
                 _authState.value = AuthUiState.Success
+
+                getUserData(email)
             } catch (e: Exception) {
                 _authState.value = AuthUiState.Error(mapFirebaseError(e))
             }
@@ -182,6 +189,15 @@ class AuthViewModel : ViewModel() {
                     AuthError.TooManyRequests
                 else -> AuthError.Unknown(exception.message ?: "Error desconocido")
             }
+        }
+    }
+
+    private suspend fun getUserData(userEmail: String) {
+        try {
+            val document = firestore.collection("users").document(userEmail).get().await()
+            _userData = document.toObject(UserData::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

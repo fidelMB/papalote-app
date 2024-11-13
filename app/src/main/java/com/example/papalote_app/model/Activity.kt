@@ -9,7 +9,10 @@ data class Activity(
     val name: String,
     val zone: String,
     val description: String,
-    val image: String
+    val image: String,
+    val isLiked: Boolean = false,
+    val isDisliked: Boolean = false,
+    val isFavorite: Boolean = false
 ) : Parcelable
 
 fun getActivities(): List<Activity> {

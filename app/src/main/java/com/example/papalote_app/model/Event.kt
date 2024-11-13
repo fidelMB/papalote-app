@@ -10,7 +10,8 @@ data class Event(
     val description: String,
     val date: String,
     val image: String,
-    val zone: String
+    val zone: String,
+    val isNotified: Boolean = false
 ) : Parcelable
 
 
