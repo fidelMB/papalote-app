@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,7 @@ fun SignIn(
         )
 
         Text(
-            text = "Iniciar Sesión",
+            text = "Iniciar sesión",
             style = MaterialTheme.typography.headlineMedium.copy(
                 color = Color(0xFF1D1B20),
                 fontWeight = FontWeight(600)
@@ -66,19 +67,17 @@ fun SignIn(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-
-
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         AuthButton(
-            text = "Iniciar Sesión",
+            text = "Iniciar sesión",
             onClick = onLogin,
             modifier = Modifier.fillMaxWidth(),
             isLoading = isLoading,
             enabled = formState.email.isValid && formState.password.isValid
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.padding(bottom = 8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -90,7 +89,8 @@ fun SignIn(
             TextButton(onClick = onNavigateToRegister) {
                 Text(
                     "Regístrate",
-                    color = Color(0xFFDBE78E)
+                    color = Color(0xFF838f01),
+                    fontStyle = FontStyle.Italic
                 )
             }
         }
@@ -100,7 +100,8 @@ fun SignIn(
         ) {
             Text(
                 "¿Olvidaste tu contraseña?",
-                color = Color(0xFFDBE78E)
+                color = Color(0xFF838f01),
+                fontStyle = FontStyle.Italic
             )
         }
     }

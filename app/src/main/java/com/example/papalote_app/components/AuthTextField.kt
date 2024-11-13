@@ -38,8 +38,8 @@ fun AuthTextField(
             trailingIcon = trailingIcon,
             readOnly = readOnly,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFDBE78E),
-                focusedLabelColor = Color(0xFFDBE78E)
+                focusedBorderColor = Color(0xFFC4D600),
+                focusedLabelColor = Color(0xFFC4D600)
             )
         )
 
