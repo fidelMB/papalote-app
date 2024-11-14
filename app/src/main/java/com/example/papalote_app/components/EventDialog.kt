@@ -28,6 +28,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.IconButton
 
+import androidx.compose.material.icons.filled.DateRange
+
+
+
 @Composable
 fun EventDialog(event: Event, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
@@ -75,7 +79,7 @@ fun EventDialog(event: Event, onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Notifications, // Icono de calendario
+                        imageVector = Icons.Default.DateRange, // Icono de calendario
                         contentDescription = "Date Icon",
                         tint = Color(0xFFC4D600),
                         modifier = Modifier.padding(end = 4.dp)
