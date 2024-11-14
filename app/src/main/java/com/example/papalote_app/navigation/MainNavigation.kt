@@ -1,11 +1,17 @@
 // navigation/MainNavigation.kt
 package com.example.papalote_app.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.papalote_app.components.ProfileViewModel
 import com.example.papalote_app.model.UserProfile
 import com.example.papalote_app.screens.*
 
@@ -15,6 +21,8 @@ fun MainNavigation(
     navController: NavHostController,
     onSignOut: () -> Unit
 ) {
+    val profileViewModel: ProfileViewModel = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = Screen.QR.route,
@@ -37,11 +45,14 @@ fun MainNavigation(
         }
 
         composable(Screen.Profile.route) {
-            val user = UserProfile(name = "John Doe", email = "johndoe@example.com", phone = "123-456-7890", url="img")
             Profile(
                 navController = navController,
+                user = profileViewModel.user.collectAsState().value,
                 onSignOut = onSignOut,
-                user = user
+                onImageChange = { uri ->
+                    profileViewModel.updateProfilePicture(uri) // Use the correct function name here
+                    Log.d("Profile", "Profile picture updated: ${uri.toString()}")
+                }
             )
         }
     }

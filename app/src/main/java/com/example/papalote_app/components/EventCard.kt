@@ -1,5 +1,6 @@
 package com.example.papalote_app.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,13 +32,14 @@ import com.example.papalote_app.model.Event
 import com.example.papalote_app.model.getEvents
 
 @Composable
-fun EventCard(event: Event = getEvents()[1]) {
+fun EventCard(event: Event = getEvents()[1],onClick:(Event)->Unit) {
     Card(
         shape = RoundedCornerShape(corner = CornerSize(12.dp)),
         modifier = Modifier
             .fillMaxWidth()
             .height(110.dp)
-            .padding(16.dp, 8.dp, 16.dp, 8.dp),
+            .padding(16.dp, 8.dp, 16.dp, 8.dp)
+            .clickable { onClick(event) } ,
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),

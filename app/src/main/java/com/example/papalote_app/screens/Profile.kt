@@ -1,4 +1,7 @@
 package com.example.papalote_app.screens
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +31,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,10 +46,38 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.papalote_app.R
 import com.example.papalote_app.model.UserProfile
+import coil.compose.rememberImagePainter
 
 
 @Composable
-fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Unit) {
+fun Profile(
+    navController: NavController,
+    user: UserProfile,
+    onSignOut: () -> Unit,
+    onImageChange: (Uri) -> Unit
+) {
+    // Initialize selectedImageUri with user.url
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+
+    // Set the initial value based on user.url
+    LaunchedEffect(user.url) {
+        selectedImageUri.value = if (user.url.isNotEmpty() && user.url != "img") {
+            Uri.parse(user.url)
+        } else {
+            null
+        }
+    }
+
+    // Image picker launcher
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            selectedImageUri.value = it
+            onImageChange(it)
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +114,7 @@ fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Un
                         border = BorderStroke(2.dp, Color.LightGray)
                     ) {
                         Image(
-                            painter = painterResource(id = getDrawableResourceId(user.url)),
+                            painter = rememberImagePainter(data = selectedImageUri.value ?: getDrawableResourceId(user.url)),
                             contentDescription = "Profile picture",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -88,7 +122,7 @@ fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Un
                     }
                     // Edit Button
                     IconButton(
-                        onClick = { /* Handle image change */ },
+                        onClick = { launcher.launch("image/*") }, // Launch image picker
                         modifier = Modifier
                             .offset(x = 40.dp, y = 40.dp)
                             .size(32.dp)
@@ -178,10 +212,10 @@ fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Un
     }
 }
 
+// Assuming `getDrawableResourceId` function is correctly defined elsewhere
 fun getDrawableResourceId(resourceName: String): Int {
     return when (resourceName) {
         "img" -> R.drawable.img
         else -> R.drawable.img // Use the same image if you do not have a default one
-
     }
 }
