@@ -1,9 +1,7 @@
 package com.example.papalote_app.screens
 
-import android.content.Context
-import com.example.papalote_app.R
-import com.example.papalote_app.components.PopUpComponentEvents
 
+import com.example.papalote_app.R
 import androidx.compose.runtime.Composable
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -14,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -57,34 +56,94 @@ fun Map(navController: NavController) {
         navController.popBackStack()
     }
 
-    // Estado para la pestaña seleccionada (representando los pisos)
+    // Estados para las pestañas
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pisos = listOf("PB", "S1", "S2")
+
+    var selectedTopTabIndex by remember { mutableIntStateOf(0) }
+    val topTabs: List<Pair<String, Int>> = listOf(
+        Pair("Opciones", R.drawable.expreso_1),
+        Pair("Opciones", R.drawable.expreso_1),
+        Pair("Opciones", R.drawable.expreso_1),
+        Pair("Opciones", R.drawable.expreso_1),
+        Pair("Opciones", R.drawable.expreso_1),
+        Pair("Opciones", R.drawable.expreso_1)
+    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFC4D600)) // Fondo verde general
+            .wrapContentHeight() // La altura se ajusta al contenido dentro de la Box
+            .background(Color.White)
     ) {
+        // Contenido principal
+        Column {
+            Text(
+                text = "Mapa",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    color = Color(0xFF1D1B20),
+                    fontWeight = FontWeight(600)
+                ),
+                modifier = Modifier
+                    .padding(32.dp, 16.dp, 32.dp, 0.dp)
+                    .height(44.dp)
+            )
+            // Scrollable TabRow superior
+            ScrollableTabRow(
+                selectedTabIndex = selectedTopTabIndex,
+                containerColor = Color.White,
+                contentColor = Color.Black,
+                edgePadding = 16.dp, // Padding a los lados para evitar corte
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .height(50.dp)
+            ) {
+                topTabs.forEachIndexed { index, (title, iconRes) ->
+                    Tab(
+                        selected = selectedTopTabIndex == index,
+                        onClick = { selectedTopTabIndex = index },
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                Image(
+                                    painter = painterResource(id = iconRes),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(33.dp)
+                                        .padding(end = 8.dp)
+                                )
+                                Text(
+                                    text = title,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    )
+                }
+            }
 
-        // Contenido de cada piso, que incluye el mapa interactivo
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 56.dp) // Espacio para el header
-        ) {
-            when (selectedTabIndex) {
-                0 -> PisoContent(piso = 0) // Contenido del Piso PB
-                1 -> PisoContent(piso = 1) // Contenido del Piso S1
-                2 -> PisoContent(piso = 2) // Contenido del Piso S2
+            // Contenido principal del mapa
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 0.dp) // Espacio para el header
+            ) {
+                when (selectedTabIndex) {
+                    0 -> PisoContent(piso = 0) // Contenido del Piso PB
+                    1 -> PisoContent(piso = 1) // Contenido del Piso S1
+                    2 -> PisoContent(piso = 2) // Contenido del Piso S2
+                }
             }
         }
 
-        // TabRow en la parte inferior, centrado y pequeño
+        // TabRow inferior (debajo del mapa)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(30.dp)
                 .align(Alignment.BottomCenter)
         ) {
             TabRow(
@@ -100,7 +159,6 @@ fun Map(navController: NavController) {
                         shape = RoundedCornerShape(24.dp) // Esquinas redondeadas
                     )
                     .shadow(8.dp, RoundedCornerShape(24.dp)) // Sombra
-
             ) {
                 pisos.forEachIndexed { index, title ->
                     Tab(
@@ -114,20 +172,6 @@ fun Map(navController: NavController) {
     }
 }
 
-
-//Funcion para poder ver un preview del popup
-@Preview(showBackground = true)
-@Composable
-fun InfoPopupPreview() {
-    InfoPopup(
-        showPopup = true, // Set to true to display the popup in the preview
-        title = "Sample Title",
-        message = "This is a sample message.",
-        options = listOf("Option 1", "Option 2", "Option 3"),
-        onDismiss = { /* No-op for preview */ }
-    )
-}
-
 @Composable
 fun InfoPopup(
     showPopup: Boolean,
@@ -137,13 +181,10 @@ fun InfoPopup(
     onDismiss: () -> Unit
 ) {
     val activityImage = painterResource(id = R.drawable.media)
-//    val favoriteIcon = painterResource(id = R.drawable.favorite)
-//    val thumbupIcon = painterResource(id = R.drawable.thumb_up)
-//    val thumbdownIcon = painterResource(id = R.drawable.thumb_down)
     val activityAreaIcon = painterResource(id = R.drawable.expreso_1)
 
-
     var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
+    val icons = remember { mutableStateListOf(R.drawable.ic_add) }
 
     if (showPopup) {
         Dialog(
@@ -164,52 +205,77 @@ fun InfoPopup(
                         .align(Alignment.BottomEnd)
                         .height(400.dp)
                 ) {
-                    Column(modifier = Modifier
+                    Column(
+                        modifier = Modifier
                     ) {
                         options.forEachIndexed { index, option ->
+                            if (icons.size <= index) {
+                                icons.add(R.drawable.ic_add)
+                            }
                             AnimatedVisibility(visible = expandedOptionIndex == null || expandedOptionIndex == index) {
                                 Column {
-                                    Button(
-                                        onClick = {
-                                        expandedOptionIndex =
-                                            if (expandedOptionIndex == index) null else index }
-                                        ,modifier = Modifier
-                                            .fillMaxWidth() // Fill the width of the popup
-                                            .height(71.dp) // Set the height of the button)
-                                        ,colors = ButtonDefaults.buttonColors(Color.Transparent)
-                                        ,contentPadding = PaddingValues(0.dp)
-                                        ,shape = RectangleShape
-                                        ) {
-                                        Column {
-                                            Row(
-                                                horizontalArrangement = Arrangement.Start,
-                                                modifier = Modifier.padding(start = 16.dp)
-                                            ) {
-                                                Column {
-                                                    Image(
-                                                        painter = activityAreaIcon,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(40.dp)
-                                                    )
+                                    Column {
+                                        Button(
+                                            onClick = {
+                                                expandedOptionIndex = if (expandedOptionIndex == index) null else index
+                                                // Alternar entre los íconos
+                                                icons[index] = if (icons[index] == R.drawable.ic_add) {
+                                                    R.drawable.ic_remove
+                                                } else {
+                                                    R.drawable.ic_add
                                                 }
-                                                Column(modifier = Modifier.padding(start = 8.dp)) {
-                                                    Row {
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth() // Fill the width of the popup
+                                                .height(71.dp), // Set the height of the button
+                                            colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                            contentPadding = PaddingValues(0.dp),
+                                            shape = RectangleShape
+                                        ) {
+                                            Column {
+                                                Row(
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                ) {
+                                                    // Icon and Text on the left
+                                                    Row(modifier = Modifier.padding(start = 16.dp)) {
+                                                        Image(
+                                                            painter = activityAreaIcon,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(50.dp)
+                                                        )
+                                                    }
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Column(
+                                                        modifier = Modifier.weight(1f),
+                                                        verticalArrangement = Arrangement.Center
+                                                    ) {
                                                         Text(
                                                             text = option,
                                                             color = Color.Black,
                                                             fontSize = 16.sp,
-                                                            textAlign = TextAlign.Center,
+                                                            textAlign = TextAlign.Start,
                                                             fontWeight = FontWeight.Bold
                                                         )
+                                                        Text(
+                                                            text = "Zona",
+                                                            color = Color.Black
+                                                        )
                                                     }
-                                                    Row {
-                                                        Text("Zona", color = Color.Black)
-                                                    }
+                                                    // Icon on the right
+                                                    Image(
+                                                        painter = painterResource(id = icons[index]),
+                                                        contentDescription = null,
+                                                        modifier = Modifier
+                                                            .size(40.dp)
+                                                            .align(Alignment.CenterVertically)
+                                                            .padding(end = 16.dp)
+                                                    )
                                                 }
                                             }
-                                            Row (modifier = Modifier.width(400.dp)) {}
                                         }
                                     }
+
                                     AnimatedVisibility(visible = expandedOptionIndex == index) {
                                         Box {
                                             Column {
@@ -288,12 +354,12 @@ fun InfoPopup(
                                                         }
                                                         Spacer(modifier = Modifier.padding(start = 135.dp)) // Espacio entre botones y el botón "Regresar"
 
-                                                        Button(
-                                                            onClick = { /* Acción para el botón Regresar */ },
-                                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC4D600))
-                                                        ) {
-                                                            Text("Listo", color = Color.Black)
-                                                        }
+//                                                        Button(
+//                                                            onClick = { /* Acción para el botón Regresar */ },
+//                                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC4D600))
+//                                                        ) {
+//                                                            Text("Listo", color = Color.Black)
+//                                                        }
                                                     }
                                                 }
 
@@ -838,7 +904,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFC4D600)) // Fondo Mapa interactivo
+            .background(Color(0xFFC4D600)) // Fondo Mapa interactivo verde 0xFFC4D600
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
                     scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
@@ -868,7 +934,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                                 }
                                 if (isPointInPolygon(tapOffset, transformedPoints)) {
                                     coroutineScope.launch {
-                                        areaColors[index].value = Color.Yellow
+                                        areaColors[index].value = Color.LightGray
                                         delay(300)
                                         areaColors[index].value = area.initialColor
                                     }
@@ -895,6 +961,13 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 drawPath(path = path, color = areaColors[index].value.copy(alpha = 0.9f))
             }
         }
+        InfoPopup(
+            showPopup = showPopup,
+            title = "Details for $selectedAreaLabel",
+            message = "",
+            options = listOf("Expreso", "Soy", "Comprendo"),
+            onDismiss = { showPopup = false }
+        )
 
         // Botones de Zoom In y Zoom Out en la parte inferior derecha
 //        Column(
@@ -931,13 +1004,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
 //                )
 //            }
 //        }
-        InfoPopup(
-            showPopup = showPopup,
-            title = "Details for $selectedAreaLabel",
-            message = "Here's more information about the selected area.",
-            options = listOf("Expreso", "Soy", "Comprendo"),
-            onDismiss = { showPopup = false }
-        )
+
     }
 }
 
