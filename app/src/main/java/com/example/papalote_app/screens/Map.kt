@@ -136,11 +136,10 @@ fun InfoPopup(
     options: List<String>,
     onDismiss: () -> Unit
 ) {
-
     val activityImage = painterResource(id = R.drawable.media)
-    val favoriteIcon = painterResource(id = R.drawable.favorite)
-    val thumbupIcon = painterResource(id = R.drawable.thumb_up)
-    val thumbdownIcon = painterResource(id = R.drawable.thumb_down)
+//    val favoriteIcon = painterResource(id = R.drawable.favorite)
+//    val thumbupIcon = painterResource(id = R.drawable.thumb_up)
+//    val thumbdownIcon = painterResource(id = R.drawable.thumb_down)
     val activityAreaIcon = painterResource(id = R.drawable.expreso_1)
 
 
@@ -153,12 +152,12 @@ fun InfoPopup(
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 Card(
-
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 8.dp,
                         pressedElevation = 4.dp,
                         focusedElevation = 4.dp
                     ),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
@@ -167,7 +166,6 @@ fun InfoPopup(
                 ) {
                     Column(modifier = Modifier
                     ) {
-                        // ... title and message ...
                         options.forEachIndexed { index, option ->
                             AnimatedVisibility(visible = expandedOptionIndex == null || expandedOptionIndex == index) {
                                 Column {
@@ -288,7 +286,7 @@ fun InfoPopup(
                                                                 tint = Color.Black
                                                             )
                                                         }
-                                                        Spacer(modifier = Modifier.padding(start = 120.dp)) // Espacio entre botones y el botón "Regresar"
+                                                        Spacer(modifier = Modifier.padding(start = 135.dp)) // Espacio entre botones y el botón "Regresar"
 
                                                         Button(
                                                             onClick = { /* Acción para el botón Regresar */ },
