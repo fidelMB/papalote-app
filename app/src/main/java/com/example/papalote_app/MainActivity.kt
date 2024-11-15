@@ -12,28 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.papalote_app.components.NavBar
-import com.example.papalote_app.model.UserProfile
-import com.example.papalote_app.navigation.Screen
-import com.example.papalote_app.screens.Events
-import com.example.papalote_app.screens.Favorites
-import com.example.papalote_app.screens.Map
-import com.example.papalote_app.screens.Profile
-import com.example.papalote_app.screens.QR
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
-import com.example.papalote_app.components.NavBar
 import com.example.papalote_app.features.auth.AuthNavigation
 import com.example.papalote_app.features.auth.AuthUiState
 import com.example.papalote_app.features.auth.AuthViewModel
@@ -60,6 +46,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val viewModel: AuthViewModel = viewModel()
                     val authState by viewModel.authState.collectAsState()
+                    val userData by viewModel.userData.collectAsState()
+
+
 
                     when (authState) {
                         is AuthUiState.Success -> {
@@ -68,11 +57,14 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxSize(),
                                 bottomBar = { NavBar(navController = navController) }
                             ) { innerPadding ->
-                                MainNavigation(
-                                    modifier = Modifier.padding(innerPadding),
-                                    navController = navController,
-                                    onSignOut = { viewModel.signOut() }
-                                )
+                                userData?.let {
+                                    MainNavigation(
+                                        modifier = Modifier.padding(innerPadding),
+                                        navController = navController,
+                                        onSignOut = { viewModel.signOut() },
+                                        userData = it
+                                    )
+                                }
                             }
                         }
                         is AuthUiState.NotAuthenticated,

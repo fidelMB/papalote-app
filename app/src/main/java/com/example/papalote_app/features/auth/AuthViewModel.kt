@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.auth.User
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,8 +32,8 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthUiState>(AuthUiState.Initial)
     val authState: StateFlow<AuthUiState> = _authState
 
-    private var _userData: UserData? = null
-    val userData: UserData? get() = _userData
+    private val _userData = MutableStateFlow<UserData?>(UserData())
+    val userData: StateFlow<UserData?> = _userData
 
     init {
         checkAuthState()
@@ -194,8 +193,20 @@ class AuthViewModel : ViewModel() {
 
     private suspend fun getUserData(userEmail: String) {
         try {
-            val document = firestore.collection("users").document(userEmail).get().await()
-            _userData = document.toObject(UserData::class.java)
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            // Query for the document where the "email" field matches userEmail
+            if (userId != null) {
+                val querySnapshot = firestore.collection("users")
+                    .document(userId)  // Access the current user's document directly
+                    .get()
+                    .await()
+                _userData.value = querySnapshot.toObject(UserData::class.java)
+                println("USUARIO ${userData.value?.fullName} ${userData.value?.birthDate}")
+
+            } else {
+                // Handle the case where no document with the specified email was found
+                println("No user found with email $userEmail")
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -6,14 +6,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.papalote_app.model.UserProfile
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.screens.*
 
 @Composable
 fun MainNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    userData: UserData
 ) {
     NavHost(
         navController = navController,
@@ -37,11 +38,9 @@ fun MainNavigation(
         }
 
         composable(Screen.Profile.route) {
-            val user = UserProfile(name = "John Doe", email = "johndoe@example.com", phone = "123-456-7890", url="img")
             Profile(
-                navController = navController,
                 onSignOut = onSignOut,
-                user = user
+                userData = userData
             )
         }
     }
