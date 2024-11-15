@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -906,12 +907,14 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFC4D600)) // Fondo Mapa interactivo verde 0xFFC4D600
+            .clipToBounds() // Recorta cualquier parte del mapa que sobresalga
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
                     scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
                     val adjustedPan = pan * scale.floatValue
                     offset.value += adjustedPan + (centroid * (1 - zoom))
                 }
+
             }
     ) {
         Canvas(
