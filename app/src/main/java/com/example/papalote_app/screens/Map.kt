@@ -138,10 +138,11 @@ fun InfoPopup(
 ) {
 
     val activityImage = painterResource(id = R.drawable.media)
-    val heatIcon = painterResource(id = R.drawable.favorite)
+    val favoriteIcon = painterResource(id = R.drawable.favorite)
     val thumbupIcon = painterResource(id = R.drawable.thumb_up)
     val thumbdownIcon = painterResource(id = R.drawable.thumb_down)
     val activityAreaIcon = painterResource(id = R.drawable.expreso_1)
+
 
     var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
 
@@ -234,37 +235,70 @@ fun InfoPopup(
                                                         modifier = Modifier.padding(start = 16.dp)
                                                     )
                                                 }
-                                                Column { // Column with images and button
-                                                    Row( // Row for images
-                                                        verticalAlignment = Alignment.CenterVertically, // Align images vertically
+                                                Column { // Column with icons and button
+                                                    Row( // Row for icons
+                                                        verticalAlignment = Alignment.CenterVertically, // Align icons vertically
                                                         modifier = Modifier.padding(start = 16.dp) // Add padding to the start
                                                     ) {
-                                                        Image(
-                                                            painter = heatIcon,
-                                                            contentDescription = null,
-                                                            modifier = Modifier.size(24.dp) // Set size for images
-                                                        )
-                                                        Spacer(modifier = Modifier.width(8.dp)) // Add space between images
-                                                        Image(
-                                                            painter = thumbupIcon,
-                                                            contentDescription = null,
-                                                            modifier = Modifier.size(24.dp)
-                                                        )
-                                                        Spacer(modifier = Modifier.width(8.dp))
-                                                        Image(
-                                                            painter = thumbdownIcon,
-                                                            contentDescription = null,
-                                                            modifier = Modifier.size(24.dp)
-                                                        )
-                                                        Spacer(modifier = Modifier.padding(start = 180.dp)) // Add space between images and button
+                                                        // Estados para controlar el ícono activo (filled o outlined)
+                                                        var isFavoriteFilled by remember { mutableStateOf(false) }
+                                                        var isThumbUpFilled by remember { mutableStateOf(false) }
+                                                        var isThumbDownFilled by remember { mutableStateOf(false) }
+
                                                         Button(
-                                                            onClick = {},
-                                                            colors = ButtonDefaults.buttonColors(Color.Yellow)
+                                                            onClick = { isFavoriteFilled = !isFavoriteFilled },
+                                                            modifier = Modifier.size(40.dp), // Ajusta el tamaño del botón
+                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                                            contentPadding = PaddingValues(0.dp) // Elimina el relleno interno
                                                         ) {
-                                                            Text("Listo", color = Color.Green)
+                                                            Icon(
+                                                                painter = if (isFavoriteFilled) painterResource(id = R.drawable.favorite_filled) else painterResource(id = R.drawable.favorite),
+                                                                contentDescription = null,
+                                                                modifier = Modifier.size(24.dp), // Ajusta el tamaño del ícono
+                                                                tint = Color.Black
+                                                            )
+                                                        }
+                                                        Spacer(modifier = Modifier.width(8.dp)) // Añade espacio entre los botones
+
+                                                        Button(
+                                                            onClick = { isThumbUpFilled = !isThumbUpFilled },
+                                                            modifier = Modifier.size(40.dp),
+                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                                            contentPadding = PaddingValues(0.dp)
+                                                        ) {
+                                                            Icon(
+                                                                painter = if (isThumbUpFilled) painterResource(id = R.drawable.thumb_up_filled) else painterResource(id = R.drawable.thumb_up),
+                                                                contentDescription = null,
+                                                                modifier = Modifier.size(24.dp),
+                                                                tint = Color.Black
+                                                            )
+                                                        }
+                                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                                        Button(
+                                                            onClick = { isThumbDownFilled = !isThumbDownFilled },
+                                                            modifier = Modifier.size(40.dp),
+                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                                            contentPadding = PaddingValues(0.dp)
+                                                        ) {
+                                                            Icon(
+                                                                painter = if (isThumbDownFilled) painterResource(id = R.drawable.thumb_down_filled) else painterResource(id = R.drawable.thumb_down),
+                                                                contentDescription = null,
+                                                                modifier = Modifier.size(24.dp),
+                                                                tint = Color.Black
+                                                            )
+                                                        }
+                                                        Spacer(modifier = Modifier.padding(start = 120.dp)) // Espacio entre botones y el botón "Regresar"
+
+                                                        Button(
+                                                            onClick = { /* Acción para el botón Regresar */ },
+                                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC4D600))
+                                                        ) {
+                                                            Text("Listo", color = Color.Black)
                                                         }
                                                     }
                                                 }
+
                                             }
                                         }
                                     }
@@ -278,6 +312,17 @@ fun InfoPopup(
     }
 }
 
+fun toggleFavorite(isFavoriteFilled: MutableState<Boolean>) {
+    isFavoriteFilled.value = !isFavoriteFilled.value
+}
+
+fun toggleThumbUp(isThumbUpFilled: MutableState<Boolean>) {
+    isThumbUpFilled.value = !isThumbUpFilled.value
+}
+
+fun toggleThumbDown(isThumbDownFilled: MutableState<Boolean>) {
+    isThumbDownFilled.value = !isThumbDownFilled.value
+}
 
 
 // Función para verificar si un punto está dentro de un polígono
