@@ -16,10 +16,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.papalote_app.components.EventCard
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.model.getEvents
 
 @Composable
-fun Events(navController: NavController) {
+fun Events(userData: UserData) {
     Box(
         modifier = Modifier
             .fillMaxSize()

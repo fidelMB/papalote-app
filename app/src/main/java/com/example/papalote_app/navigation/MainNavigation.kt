@@ -22,19 +22,27 @@ fun MainNavigation(
         modifier = modifier
     ) {
         composable(Screen.Events.route) {
-            Events(navController = navController)
+            Events(
+                userData = userData
+            )
         }
 
         composable(Screen.Map.route) {
-            Map(navController = navController)
+            Map(
+                userData = userData
+            )
         }
 
         composable(Screen.QR.route) {
-            QR(navController = navController)
+            QR(
+                userData = userData
+            )
         }
 
         composable(Screen.Favorites.route) {
-            Favorites()
+            Favorites(
+                userData = userData
+            )
         }
 
         composable(Screen.Profile.route) {

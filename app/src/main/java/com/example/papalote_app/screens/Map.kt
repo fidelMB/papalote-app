@@ -1,16 +1,11 @@
 package com.example.papalote_app.screens
 
-import android.content.Context
 import com.example.papalote_app.R
-import com.example.papalote_app.components.PopUpComponentEvents
-
 import androidx.compose.runtime.Composable
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -27,17 +22,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavController
+import com.example.papalote_app.model.UserData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -51,11 +44,7 @@ data class PolygonArea(
 )
 
 @Composable
-fun Map(navController: NavController) {
-
-    BackHandler {
-        navController.popBackStack()
-    }
+fun Map(userData: UserData) {
 
     // Estado para la pestaña seleccionada (representando los pisos)
     var selectedTabIndex by remember { mutableIntStateOf(0) }
