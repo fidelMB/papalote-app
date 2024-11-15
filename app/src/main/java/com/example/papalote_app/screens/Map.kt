@@ -255,7 +255,7 @@ fun InfoPopup(
                                                                 painter = if (isFavoriteFilled) painterResource(id = R.drawable.favorite_filled) else painterResource(id = R.drawable.favorite),
                                                                 contentDescription = null,
                                                                 modifier = Modifier.size(24.dp), // Ajusta el tamaño del ícono
-                                                                tint = Color.Black
+                                                                tint = Color.Black // color negro
                                                             )
                                                         }
                                                         Spacer(modifier = Modifier.width(8.dp)) // Añade espacio entre los botones
