@@ -76,8 +76,21 @@ fun Map(navController: NavController) {
             .wrapContentHeight() // La altura se ajusta al contenido dentro de la Box
             .background(Color.White)
     ) {
-        // Contenido principal
         Column {
+            // Contenido principal del mapa
+            Box(modifier = Modifier.fillMaxSize()) {
+                when (selectedTabIndex) {
+                    0 -> PisoContent(piso = 0) // Contenido del Piso PB
+                    1 -> PisoContent(piso = 1) // Contenido del Piso S1
+                    2 -> PisoContent(piso = 2) // Contenido del Piso S2
+                }
+            }
+        }
+        // Contenido principal
+        Column (
+            modifier = Modifier
+                .background(Color.White)
+        ){
             Text(
                 text = "Mapa",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -125,18 +138,6 @@ fun Map(navController: NavController) {
                 }
             }
 
-            // Contenido principal del mapa
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 0.dp) // Espacio para el header
-            ) {
-                when (selectedTabIndex) {
-                    0 -> PisoContent(piso = 0) // Contenido del Piso PB
-                    1 -> PisoContent(piso = 1) // Contenido del Piso S1
-                    2 -> PisoContent(piso = 2) // Contenido del Piso S2
-                }
-            }
         }
 
         // TabRow inferior (debajo del mapa)
