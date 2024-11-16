@@ -14,6 +14,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -59,12 +60,12 @@ fun Map(navController: NavController) {
 
     var selectedTopTabIndex by remember { mutableIntStateOf(0) }
     val topTabs: List<Pair<String, Int>> = listOf(
-        Pair("Opciones", R.drawable.expreso_1),
-        Pair("Opciones", R.drawable.expreso_1),
-        Pair("Opciones", R.drawable.expreso_1),
-        Pair("Opciones", R.drawable.expreso_1),
-        Pair("Opciones", R.drawable.expreso_1),
-        Pair("Opciones", R.drawable.expreso_1)
+        Pair("Expreso", R.drawable.expreso),
+        Pair("Soy", R.drawable.soy),
+        Pair("Comprendo", R.drawable.comprendo),
+        Pair("Pertenezco", R.drawable.pertenezco),
+        Pair("Pequeños", R.drawable.pequenos),
+        Pair("Comunico", R.drawable.comunico)
     )
 
     Box(
@@ -103,11 +104,26 @@ fun Map(navController: NavController) {
                 selectedTabIndex = selectedTopTabIndex,
                 containerColor = Color.White,
                 contentColor = Color.Black,
-                edgePadding = 16.dp, // Padding a los lados para evitar corte
+                edgePadding = 16.dp,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .height(54.dp)
+                    .height(60.dp),
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTopTabIndex]),
+                        color = when (selectedTopTabIndex) {
+                            0 -> Color(0xFFF58220)
+                            1 -> Color(0xFFDB1E36)
+                            2 -> Color(0xFF853694)
+                            3 -> Color(0xFFC0D330)
+                            4 -> Color(0xFF009BA7)
+                            5 -> Color(0xFF006D9E)
+                            else -> Color.Cyan
+                        },
+                        height = 4.dp // Puedes ajustar el grosor del indicador
+                    )
+                }
             ) {
                 topTabs.forEachIndexed { index, (title, iconRes) ->
                     Tab(
@@ -122,7 +138,7 @@ fun Map(navController: NavController) {
                                     painter = painterResource(id = iconRes),
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .size(33.dp)
+                                        .size(40.dp)
                                         .padding(end = 8.dp)
                                 )
                                 Text(
@@ -134,6 +150,7 @@ fun Map(navController: NavController) {
                     )
                 }
             }
+
 
         }
 
@@ -177,7 +194,7 @@ fun InfoPopup(
     onDismiss: () -> Unit
 ) {
     val activityImage = painterResource(id = R.drawable.media)
-    val activityAreaIcon = painterResource(id = R.drawable.expreso_1)
+    val activityAreaIcon = painterResource(id = R.drawable.expreso)
 
     var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
     val icons = remember { mutableStateListOf(R.drawable.ic_add) }
