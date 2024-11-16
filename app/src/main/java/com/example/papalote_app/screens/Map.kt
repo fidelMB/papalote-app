@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -190,13 +192,15 @@ fun Map(navController: NavController) {
 @Composable
 fun InfoPopup(
     showPopup: Boolean,
-    options: List<String>,
+    optionsWithImages: Map<String, Int>, // Map que asocia opciones con imágenes
     onDismiss: () -> Unit
 ) {
     val activityImage = painterResource(id = R.drawable.media)
-    val activityAreaIcon = painterResource(id = R.drawable.expreso)
+//    val activityAreaIcon = painterResource(id = R.drawable.expreso)
     var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
+    val options = optionsWithImages.keys.toList()
     val icons = remember { mutableStateListOf(R.drawable.ic_add) }
+    val scrollState = rememberScrollState()
 
     if (showPopup) {
         Dialog(
@@ -219,6 +223,8 @@ fun InfoPopup(
                 ) {
                     Column(
                         modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState)
                     ) {
                         options.forEachIndexed { index, option ->
                             if (icons.size <= index) {
@@ -252,9 +258,10 @@ fun InfoPopup(
                                                     // Icon and Text on the left
                                                     Row(modifier = Modifier.padding(start = 16.dp)) {
                                                         Image(
-                                                            painter = activityAreaIcon,
+                                                            painter = painterResource(id = optionsWithImages[option] ?: R.drawable.comunico),
                                                             contentDescription = null,
-                                                            modifier = Modifier.size(50.dp)
+                                                            modifier = Modifier
+                                                                .height(30.dp)
                                                         )
                                                     }
                                                     Spacer(modifier = Modifier.width(8.dp))
@@ -337,7 +344,10 @@ fun InfoPopup(
                                                         Spacer(modifier = Modifier.width(8.dp)) // Añade espacio entre los botones
 
                                                         Button(
-                                                            onClick = { isThumbUpFilled = !isThumbUpFilled },
+                                                            onClick = {
+                                                                isThumbUpFilled = !isThumbUpFilled
+                                                                if (isThumbUpFilled) isThumbDownFilled = false // Desactiva el otro botón
+                                                                      },
                                                             modifier = Modifier.size(40.dp),
                                                             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                                                             contentPadding = PaddingValues(0.dp)
@@ -352,7 +362,10 @@ fun InfoPopup(
                                                         Spacer(modifier = Modifier.width(8.dp))
 
                                                         Button(
-                                                            onClick = { isThumbDownFilled = !isThumbDownFilled },
+                                                            onClick = {
+                                                                isThumbDownFilled = !isThumbDownFilled
+                                                                if (isThumbDownFilled) isThumbUpFilled = false // Desactiva el otro botón
+                                                                      },
                                                             modifier = Modifier.size(40.dp),
                                                             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                                                             contentPadding = PaddingValues(0.dp)
@@ -977,7 +990,17 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
         }
         InfoPopup(
             showPopup = showPopup,
-            options = listOf("Expreso", "Soy", "Comprendo"),
+            optionsWithImages = mapOf(
+                "Expreso" to R.drawable.expreso,
+                "Soy" to R.drawable.soy,
+                "Comprendo" to R.drawable.comprendo,
+                "Pertenezco" to R.drawable.pertenezco,
+                "Pequeños" to R.drawable.pequenos,
+                "Comunico" to R.drawable.comunico,
+                "Innovo" to R.drawable.expreso, //Actividad de prueba
+                "Juego" to R.drawable.expreso, //Actividad de prueba
+                "Descubro" to R.drawable.expreso //Actividad de prueba
+            ),
             onDismiss = { showPopup = false }
         )
 
