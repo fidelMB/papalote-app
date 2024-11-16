@@ -110,7 +110,7 @@ fun Map(navController: NavController) {
                     .background(Color.White)
                     .height(60.dp),
                 indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
+                    TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTopTabIndex]),
                         color = when (selectedTopTabIndex) {
                             0 -> Color(0xFFF58220)
@@ -195,7 +195,6 @@ fun InfoPopup(
 ) {
     val activityImage = painterResource(id = R.drawable.media)
     val activityAreaIcon = painterResource(id = R.drawable.expreso)
-
     var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
     val icons = remember { mutableStateListOf(R.drawable.ic_add) }
 
