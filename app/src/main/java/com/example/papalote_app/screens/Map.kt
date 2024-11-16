@@ -111,7 +111,7 @@ fun Map(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .height(50.dp)
+                    .height(54.dp)
             ) {
                 topTabs.forEachIndexed { index, (title, iconRes) ->
                     Tab(
