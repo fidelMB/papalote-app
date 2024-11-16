@@ -8,7 +8,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -27,14 +26,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
@@ -177,8 +173,6 @@ fun Map(navController: NavController) {
 @Composable
 fun InfoPopup(
     showPopup: Boolean,
-    title: String,
-    message: String,
     options: List<String>,
     onDismiss: () -> Unit
 ) {
@@ -378,17 +372,17 @@ fun InfoPopup(
     }
 }
 
-fun toggleFavorite(isFavoriteFilled: MutableState<Boolean>) {
-    isFavoriteFilled.value = !isFavoriteFilled.value
-}
-
-fun toggleThumbUp(isThumbUpFilled: MutableState<Boolean>) {
-    isThumbUpFilled.value = !isThumbUpFilled.value
-}
-
-fun toggleThumbDown(isThumbDownFilled: MutableState<Boolean>) {
-    isThumbDownFilled.value = !isThumbDownFilled.value
-}
+//fun toggleFavorite(isFavoriteFilled: MutableState<Boolean>) {
+//    isFavoriteFilled.value = !isFavoriteFilled.value
+//}
+//
+//fun toggleThumbUp(isThumbUpFilled: MutableState<Boolean>) {
+//    isThumbUpFilled.value = !isThumbUpFilled.value
+//}
+//
+//fun toggleThumbDown(isThumbDownFilled: MutableState<Boolean>) {
+//    isThumbDownFilled.value = !isThumbDownFilled.value
+//}
 
 
 // Función para verificar si un punto está dentro de un polígono
@@ -967,8 +961,6 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
         }
         InfoPopup(
             showPopup = showPopup,
-            title = "Details for $selectedAreaLabel",
-            message = "",
             options = listOf("Expreso", "Soy", "Comprendo"),
             onDismiss = { showPopup = false }
         )
