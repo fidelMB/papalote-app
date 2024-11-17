@@ -13,11 +13,13 @@ data class UserProfile(
 
 @Parcelize
 data class UserData(
+    var userId: String = "",
     val birthDate: String = "Cargando...",
     val createdAt: Long = 0L,
     val email: String = "Cargando...",
     val fullName: String = "Cargando...",
     val gender: String = "Cargando...",
-    val activities: List<Activity> = emptyList(),
-    val events: List<Event> = emptyList()
+    var profilePicture: Int = 1,
+    var activities: List<Activity> = emptyList(),
+    var events: List<Event> = emptyList()
 ) : Parcelable

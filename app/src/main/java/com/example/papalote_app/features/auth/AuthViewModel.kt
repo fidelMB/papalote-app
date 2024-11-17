@@ -147,6 +147,8 @@ class AuthViewModel : ViewModel() {
                                 "gender" to _formState.value.gender,
                                 "email" to email,
                                 "createdAt" to System.currentTimeMillis()
+
+
                             )
                         ).await()
                 }
@@ -200,8 +202,9 @@ class AuthViewModel : ViewModel() {
                     .document(userId)  // Access the current user's document directly
                     .get()
                     .await()
+
                 _userData.value = querySnapshot.toObject(UserData::class.java)
-                println("USUARIO ${userData.value?.fullName} ${userData.value?.birthDate}")
+                _userData.value?.userId = userId
 
             } else {
                 // Handle the case where no document with the specified email was found
