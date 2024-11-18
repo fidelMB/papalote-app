@@ -165,6 +165,16 @@ class AuthViewModel : ViewModel() {
                                 "events" to events
                             )
                         ).await()
+
+                    _userData.value = UserData(
+                        userId = uid,
+                        fullName = _formState.value.fullName.value,
+                        birthDate = _formState.value.birthDate.value,
+                        gender = _formState.value.gender,
+                        email = email,
+                        activities = activities,
+                        events = events
+                    )
                 }
 
                 _authState.value = AuthUiState.Success
