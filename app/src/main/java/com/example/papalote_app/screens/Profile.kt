@@ -37,13 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.papalote_app.R
-import com.example.papalote_app.model.UserProfile
+import com.example.papalote_app.model.UserData
 
 
 @Composable
-fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Unit) {
+fun Profile(userData: UserData, onSignOut: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +79,7 @@ fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Un
                         border = BorderStroke(2.dp, Color.LightGray)
                     ) {
                         Image(
-                            painter = painterResource(id = getDrawableResourceId(user.url)),
+                            painter = painterResource(id = getDrawableResourceId("img")),
                             contentDescription = "Profile picture",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -105,7 +104,7 @@ fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Un
 
                 // Name
                 Text(
-                    text = user.name,
+                    text = userData.fullName,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
@@ -131,7 +130,7 @@ fun Profile(navController: NavController, user: UserProfile, onSignOut: () -> Un
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = user.email,
+                        text = userData.email,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Black
                     )

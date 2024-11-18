@@ -1,9 +1,7 @@
 package com.example.papalote_app.screens
 
-
 import com.example.papalote_app.R
 import androidx.compose.runtime.Composable
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -36,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavController
+import com.example.papalote_app.model.UserData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -50,11 +48,7 @@ data class PolygonArea(
 )
 
 @Composable
-fun Map(navController: NavController) {
-
-    BackHandler {
-        navController.popBackStack()
-    }
+fun Map(userData: UserData) {
 
     // Estados para las pestañas
     var selectedTabIndex by remember { mutableIntStateOf(0) }
