@@ -26,6 +26,8 @@ import com.example.papalote_app.features.auth.AuthViewModel
 import com.example.papalote_app.navigation.MainNavigation
 import com.example.papalote_app.ui.theme.PapaloteappTheme
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,11 +46,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
+                    val firestore = Firebase.firestore
                     val viewModel: AuthViewModel = viewModel()
                     val authState by viewModel.authState.collectAsState()
                     val userData by viewModel.userData.collectAsState()
-
-
 
                     when (authState) {
                         is AuthUiState.Success -> {
@@ -62,7 +63,8 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.padding(innerPadding),
                                         navController = navController,
                                         onSignOut = { viewModel.signOut() },
-                                        userData = it
+                                        userData = it,
+                                        firestore = firestore
                                     )
                                 }
                             }

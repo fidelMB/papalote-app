@@ -18,9 +18,10 @@ import androidx.navigation.NavController
 import com.example.papalote_app.components.EventCard
 import com.example.papalote_app.model.UserData
 import com.example.papalote_app.model.getEvents
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun Events(userData: UserData) {
+fun Events(userData: UserData, firestore: FirebaseFirestore) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -42,7 +43,7 @@ fun Events(userData: UserData) {
             // lazy column that calls events from the event collection
             LazyColumn {
                 items(items = userData.events) { event ->
-                    EventCard(event)
+                    EventCard(event = event, firestore = firestore, userData = userData)
                 }
 
             }
