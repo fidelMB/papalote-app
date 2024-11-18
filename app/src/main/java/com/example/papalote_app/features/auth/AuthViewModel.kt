@@ -3,6 +3,8 @@ package com.example.papalote_app.features.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.papalote_app.model.Activity
+import com.example.papalote_app.model.Event
 import com.example.papalote_app.model.UserData
 import com.example.papalote_app.utils.Constants
 import com.example.papalote_app.utils.ValidationResult
@@ -136,7 +138,19 @@ class AuthViewModel : ViewModel() {
                 // 1. Crear usuario en Firebase Auth
                 val result = auth.createUserWithEmailAndPassword(email, password).await()
 
-                // 2. Guardar información adicional en Firestore
+                // 2. Obtener las actividades para asignarlas al usuario
+                val activities = firestore.collection("activities")
+                    .get()
+                    .await()
+                    .documents.map { document -> document.toObject(Activity::class.java)!! }
+
+                // 3. Obtener los eventos para asignarlos al usuario
+                val events = firestore.collection("events")
+                    .get()
+                    .await()
+                    .documents.map { document -> document.toObject(Event::class.java)!! }
+
+                // 4. Guardar información adicional en Firestore
                 result.user?.uid?.let { uid ->
                     firestore.collection(Constants.USERS_COLLECTION)
                         .document(uid)
@@ -146,9 +160,9 @@ class AuthViewModel : ViewModel() {
                                 "birthDate" to _formState.value.birthDate.value,
                                 "gender" to _formState.value.gender,
                                 "email" to email,
-                                "createdAt" to System.currentTimeMillis()
-
-
+                                "createdAt" to System.currentTimeMillis(),
+                                "activities" to activities,
+                                "events" to events
                             )
                         ).await()
                 }
