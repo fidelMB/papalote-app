@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.papalote_app.R
@@ -111,7 +112,7 @@ fun Register(
             enabled = formState.isValid
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -122,7 +123,8 @@ fun Register(
             TextButton(onClick = onNavigateToLogin) {
                 Text(
                     "Inicia sesión",
-                    color = Color(0xFFDBE78E)
+                    color = Color(0xFF838f01),
+                    fontStyle = FontStyle.Italic
                 )
             }
         }

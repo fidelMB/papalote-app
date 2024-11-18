@@ -46,7 +46,7 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController) {
             selected = currentRoute == Screen.Events.route,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF5C631D),
-                indicatorColor = Color(0xFFE0E994),
+                indicatorColor = Color(0xFFC4D600),
                 unselectedIconColor = Color.Black,
             )
 
@@ -60,7 +60,7 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController) {
             selected = currentRoute == Screen.Map.route,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF5C631D),
-                indicatorColor = Color(0xFFE0E994),
+                indicatorColor = Color(0xFFC4D600),
                 unselectedIconColor = Color.Black,
             )
         )
@@ -73,7 +73,7 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController) {
             selected = currentRoute == Screen.QR.route,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF5C631D),
-                indicatorColor = Color(0xFFE0E994),
+                indicatorColor = Color(0xFFC4D600),
                 unselectedIconColor = Color.Black,
             )
         )
@@ -86,7 +86,7 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController) {
             selected = currentRoute == Screen.Favorites.route,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF5C631D),
-                indicatorColor = Color(0xFFE0E994),
+                indicatorColor = Color(0xFFC4D600),
                 unselectedIconColor = Color.Black,
             )
         )
@@ -99,7 +99,7 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController) {
             selected = currentRoute == Screen.Profile.route,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF5C631D),
-                indicatorColor = Color(0xFFE0E994),
+                indicatorColor = Color(0xFFC4D600),
                 unselectedIconColor = Color.Black,
             )
         )
