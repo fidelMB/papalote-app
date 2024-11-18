@@ -41,7 +41,7 @@ fun Events(userData: UserData) {
 
             // lazy column that calls events from the event collection
             LazyColumn {
-                items(items = getEvents()) { event ->
+                items(items = userData.events) { event ->
                     EventCard(event)
                 }
 

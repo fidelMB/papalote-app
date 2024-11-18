@@ -36,7 +36,7 @@ fun Favorites(userData: UserData) {
                 modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
             )
             LazyColumn {
-                items(items = getActivities()) { activity ->
+                items(items = userData.activities) { activity ->
                     FavoriteCard(activity)
                 }
             }
