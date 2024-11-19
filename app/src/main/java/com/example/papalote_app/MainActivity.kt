@@ -1,17 +1,22 @@
 // MainActivity.kt
 package com.example.papalote_app
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,10 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.papalote_app.components.NavBar
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.papalote_app.features.auth.AuthNavigation
 import com.example.papalote_app.features.auth.AuthUiState
 import com.example.papalote_app.features.auth.AuthViewModel
+import com.example.papalote_app.features.notifications.NotificationsViewModel
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.navigation.MainNavigation
 import com.example.papalote_app.ui.theme.PapaloteappTheme
 import com.google.firebase.FirebaseApp
@@ -50,6 +58,10 @@ class MainActivity : ComponentActivity() {
                     val viewModel: AuthViewModel = viewModel()
                     val authState by viewModel.authState.collectAsState()
                     val userData by viewModel.userData.collectAsState()
+                    val notificationsViewModel = NotificationsViewModel()
+                    val context = LocalContext.current
+
+                    notificationsViewModel.sendEventNotifications(context, UserData())
 
                     when (authState) {
                         is AuthUiState.Success -> {
@@ -91,4 +103,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
