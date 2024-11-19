@@ -1,5 +1,7 @@
 package com.example.papalote_app.components
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -20,9 +22,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.papalote_app.navigation.Screen
+import android.Manifest
+import android.util.Log
 
 @Composable
 fun NavBar(modifier: Modifier = Modifier, navController: NavController) {
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d("NavBar", "Notification permission granted")
+        } else {
+            Log.d("NavBar", "Notification permission denied")
+        }
+    }
+
 
     NavigationBar(
         modifier = modifier.drawBehind {
@@ -38,13 +53,17 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
+        // boton de eventos, al hacer click también va a pedir permisos de notificaciones en caso de no tener
         NavigationBarItem(
             icon = {
                 Icon(imageVector = Icons.Default.DateRange, contentDescription = "Events")
             },
-            onClick = { navController.navigate(Screen.Events.route) },
-            selected = currentRoute == Screen.Events.route,
-            colors = NavigationBarItemDefaults.colors(
+            onClick = {
+                        navController.navigate(Screen.Events.route)
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                      },
+                selected = currentRoute == Screen.Events.route,
+                colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF5C631D),
                 indicatorColor = Color(0xFFC4D600),
                 unselectedIconColor = Color.Black,
