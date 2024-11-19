@@ -17,8 +17,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,7 +30,6 @@ import com.example.papalote_app.features.auth.AuthNavigation
 import com.example.papalote_app.features.auth.AuthUiState
 import com.example.papalote_app.features.auth.AuthViewModel
 import com.example.papalote_app.features.notifications.NotificationsViewModel
-import com.example.papalote_app.model.UserData
 import com.example.papalote_app.navigation.MainNavigation
 import com.example.papalote_app.ui.theme.PapaloteappTheme
 import com.google.firebase.FirebaseApp
@@ -61,12 +58,6 @@ class MainActivity : ComponentActivity() {
                     val authState by viewModel.authState.collectAsState()
                     val userData by viewModel.userData.collectAsState()
                     val notificationsViewModel = NotificationsViewModel()
-                    val context = LocalContext.current
-
-
-
-                    notificationsViewModel.sendEventNotifications(context, UserData())
-
 
                     when (authState) {
                         is AuthUiState.Success -> {
@@ -83,6 +74,7 @@ class MainActivity : ComponentActivity() {
                                         userData = it,
                                         firestore = firestore
                                     )
+                                    notificationsViewModel.sendEventNotifications(LocalContext.current, it.events)
                                 }
                             }
                         }
