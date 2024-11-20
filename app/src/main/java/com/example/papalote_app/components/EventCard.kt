@@ -1,6 +1,7 @@
 package com.example.papalote_app.components
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,7 +44,7 @@ import com.example.papalote_app.model.getEvents
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun EventCard(event: Event = getEvents()[1], firestore: FirebaseFirestore, userData: UserData) {
+fun EventCard(event: Event = getEvents()[1], firestore: FirebaseFirestore, userData: UserData, onClick:(Event)->Unit) {
     var isNotified by remember { mutableStateOf(event.isNotified) }
 
     Card(
@@ -51,7 +52,8 @@ fun EventCard(event: Event = getEvents()[1], firestore: FirebaseFirestore, userD
         modifier = Modifier
             .fillMaxWidth()
             .height(110.dp)
-            .padding(16.dp, 8.dp, 16.dp, 8.dp),
+            .padding(16.dp, 8.dp, 16.dp, 8.dp)
+            .clickable { onClick(event) } ,
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),

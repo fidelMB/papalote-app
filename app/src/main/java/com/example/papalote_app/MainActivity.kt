@@ -2,7 +2,10 @@
 package com.example.papalote_app
 
 import android.content.Context
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,6 +40,14 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
+
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data
+            // Handle the image URI, e.g., update user profile image
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -99,4 +110,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        imagePickerLauncher.launch(intent)
+    }
+
 }
