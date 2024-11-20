@@ -60,7 +60,15 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 
-    implementation("com.google.android.gms:play-services-code-scanner:16.1.0") // Esta dependencia se utiliza para el escaneo QR
+    // Código QR
+    implementation("androidx.camera:camera-camera2:1.3.0-alpha04")
+    implementation("androidx.camera:camera-lifecycle:1.3.0-alpha04")
+    implementation("androidx.camera:camera-view:1.3.0-alpha04")
+    implementation("com.google.mlkit:barcode-scanning:17.0.3")
+    implementation("com.google.guava:guava:16.0.1")
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

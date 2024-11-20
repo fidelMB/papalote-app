@@ -29,7 +29,7 @@ fun MainNavigation(
         }
 
         composable(Screen.QR.route) {
-            QR(navController = navController)
+            QR()
         }
 
         composable(Screen.Favorites.route) {
