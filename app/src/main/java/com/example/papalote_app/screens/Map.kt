@@ -37,6 +37,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.papalote_app.model.UserData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.launch
 
 // Datos de cada área poligonal
 data class PolygonArea(
