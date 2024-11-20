@@ -23,8 +23,8 @@ fun AuthButton(
         modifier = modifier,
         enabled = enabled && !isLoading,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFDBE78E),
-            contentColor = Color.Black
+            containerColor = Color(0xFFC4D600),
+            contentColor = Color(0XFF5C631D)
         )
     ) {
         if (isLoading) {

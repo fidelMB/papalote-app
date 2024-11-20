@@ -43,14 +43,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.papalote_app.R
 import com.example.papalote_app.model.UserProfile
 import coil.compose.rememberImagePainter
-
+import com.example.papalote_app.model.UserData
 
 @Composable
 fun Profile(
+    userData: UserData,
     navController: NavController,
     user: UserProfile,
     onSignOut: () -> Unit,
@@ -114,6 +114,7 @@ fun Profile(
                         border = BorderStroke(2.dp, Color.LightGray)
                     ) {
                         Image(
+
                             painter = rememberImagePainter(data = selectedImageUri.value ?: getDrawableResourceId(user.url)),
                             contentDescription = "Profile picture",
                             contentScale = ContentScale.Crop,
@@ -139,7 +140,7 @@ fun Profile(
 
                 // Name
                 Text(
-                    text = user.name,
+                    text = userData.fullName,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
@@ -165,7 +166,7 @@ fun Profile(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = user.email,
+                        text = userData.email,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Black
                     )

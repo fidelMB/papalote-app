@@ -3,6 +3,9 @@ package com.example.papalote_app.features.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.papalote_app.model.Activity
+import com.example.papalote_app.model.Event
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.utils.Constants
 import com.example.papalote_app.utils.ValidationResult
 import com.example.papalote_app.utils.Validators
@@ -30,6 +33,9 @@ class AuthViewModel : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthUiState>(AuthUiState.Initial)
     val authState: StateFlow<AuthUiState> = _authState
+
+    private val _userData = MutableStateFlow<UserData?>(UserData())
+    val userData: StateFlow<UserData?> = _userData
 
     init {
         checkAuthState()
@@ -116,6 +122,8 @@ class AuthViewModel : ViewModel() {
                 _authState.value = AuthUiState.Loading
                 auth.signInWithEmailAndPassword(email, password).await()
                 _authState.value = AuthUiState.Success
+
+                getUserData(email)
             } catch (e: Exception) {
                 _authState.value = AuthUiState.Error(mapFirebaseError(e))
             }
@@ -130,7 +138,19 @@ class AuthViewModel : ViewModel() {
                 // 1. Crear usuario en Firebase Auth
                 val result = auth.createUserWithEmailAndPassword(email, password).await()
 
-                // 2. Guardar información adicional en Firestore
+                // 2. Obtener las actividades para asignarlas al usuario
+                val activities = firestore.collection("activities")
+                    .get()
+                    .await()
+                    .documents.map { document -> document.toObject(Activity::class.java)!! }
+
+                // 3. Obtener los eventos para asignarlos al usuario
+                val events = firestore.collection("events")
+                    .get()
+                    .await()
+                    .documents.map { document -> document.toObject(Event::class.java)!! }
+
+                // 4. Guardar información adicional en Firestore
                 result.user?.uid?.let { uid ->
                     firestore.collection(Constants.USERS_COLLECTION)
                         .document(uid)
@@ -140,9 +160,21 @@ class AuthViewModel : ViewModel() {
                                 "birthDate" to _formState.value.birthDate.value,
                                 "gender" to _formState.value.gender,
                                 "email" to email,
-                                "createdAt" to System.currentTimeMillis()
+                                "createdAt" to System.currentTimeMillis(),
+                                "activities" to activities,
+                                "events" to events
                             )
                         ).await()
+
+                    _userData.value = UserData(
+                        userId = uid,
+                        fullName = _formState.value.fullName.value,
+                        birthDate = _formState.value.birthDate.value,
+                        gender = _formState.value.gender,
+                        email = email,
+                        activities = activities,
+                        events = events
+                    )
                 }
 
                 _authState.value = AuthUiState.Success
@@ -182,6 +214,28 @@ class AuthViewModel : ViewModel() {
                     AuthError.TooManyRequests
                 else -> AuthError.Unknown(exception.message ?: "Error desconocido")
             }
+        }
+    }
+
+    private suspend fun getUserData(userEmail: String) {
+        try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            // Query for the document where the "email" field matches userEmail
+            if (userId != null) {
+                val querySnapshot = firestore.collection("users")
+                    .document(userId)  // Access the current user's document directly
+                    .get()
+                    .await()
+
+                _userData.value = querySnapshot.toObject(UserData::class.java)
+                _userData.value?.userId = userId
+
+            } else {
+                // Handle the case where no document with the specified email was found
+                println("No user found with email $userEmail")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

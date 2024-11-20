@@ -1,49 +1,43 @@
 // MainActivity.kt
 package com.example.papalote_app
 
+import android.content.Context
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.papalote_app.components.NavBar
-import com.example.papalote_app.model.UserProfile
-import com.example.papalote_app.navigation.Screen
-import com.example.papalote_app.screens.Events
-import com.example.papalote_app.screens.Favorites
-import com.example.papalote_app.screens.Map
-import com.example.papalote_app.screens.Profile
-import com.example.papalote_app.screens.QR
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
-import com.example.papalote_app.components.NavBar
 import com.example.papalote_app.features.auth.AuthNavigation
 import com.example.papalote_app.features.auth.AuthUiState
 import com.example.papalote_app.features.auth.AuthViewModel
+import com.example.papalote_app.features.notifications.NotificationsViewModel
 import com.example.papalote_app.navigation.MainNavigation
 import com.example.papalote_app.ui.theme.PapaloteappTheme
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
 
@@ -70,8 +64,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
+                    val firestore = Firebase.firestore
                     val viewModel: AuthViewModel = viewModel()
                     val authState by viewModel.authState.collectAsState()
+                    val userData by viewModel.userData.collectAsState()
+                    val notificationsViewModel = NotificationsViewModel()
 
                     when (authState) {
                         is AuthUiState.Success -> {
@@ -80,11 +77,16 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxSize(),
                                 bottomBar = { NavBar(navController = navController) }
                             ) { innerPadding ->
-                                MainNavigation(
-                                    modifier = Modifier.padding(innerPadding),
-                                    navController = navController,
-                                    onSignOut = { viewModel.signOut() }
-                                )
+                                userData?.let {
+                                    MainNavigation(
+                                        modifier = Modifier.padding(innerPadding),
+                                        navController = navController,
+                                        onSignOut = { viewModel.signOut() },
+                                        userData = it,
+                                        firestore = firestore
+                                    )
+                                    notificationsViewModel.sendEventNotifications(LocalContext.current, it.events)
+                                }
                             }
                         }
                         is AuthUiState.NotAuthenticated,
@@ -113,4 +115,5 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         imagePickerLauncher.launch(intent)
     }
+
 }

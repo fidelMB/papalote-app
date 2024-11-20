@@ -6,11 +6,12 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Event(
-    val name: String,
-    val description: String,
-    val date: String,
-    val image: String,
-    val zone: String
+    val name: String = "",
+    val description: String = "",
+    val date: String = "",
+    val image: String = "",
+    val zone: String = "",
+    var isNotified: Boolean = false
 ) : Parcelable
 
 
