@@ -8,13 +8,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.papalote_app.model.UserData
 import com.example.papalote_app.screens.*
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun MainNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     onSignOut: () -> Unit,
-    userData: UserData
+    userData: UserData,
+    firestore: FirebaseFirestore
 ) {
     NavHost(
         navController = navController,
@@ -23,7 +25,8 @@ fun MainNavigation(
     ) {
         composable(Screen.Events.route) {
             Events(
-                userData = userData
+                userData = userData,
+                firestore = firestore
             )
         }
 
