@@ -4,6 +4,10 @@ import com.example.papalote_app.R
 import androidx.compose.runtime.Composable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -251,7 +255,11 @@ fun InfoPopup(
                                         }
                                     )
 
-                                    if (isExpanded) {
+                                    AnimatedVisibility(
+                                        visible = isExpanded,
+                                        enter = expandVertically() + fadeIn(),
+                                        exit = shrinkVertically() + fadeOut()
+                                    ) {
                                         ExpandedContent()
                                     }
                                 }
@@ -263,7 +271,6 @@ fun InfoPopup(
         }
     }
 }
-
 
 
 @Composable
