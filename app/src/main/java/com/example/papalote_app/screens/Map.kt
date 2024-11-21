@@ -3,6 +3,7 @@ package com.example.papalote_app.screens
 import com.example.papalote_app.R
 import androidx.compose.runtime.Composable
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +11,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -187,204 +191,68 @@ fun Map(userData: UserData) {
 @Composable
 fun InfoPopup(
     showPopup: Boolean,
-    optionsWithImages: Map<String, Int>, // Map que asocia opciones con imágenes
+    optionsWithImages: Map<String, Int>,
     onDismiss: () -> Unit
 ) {
-    val activityImage = painterResource(id = R.drawable.media)
-//    val activityAreaIcon = painterResource(id = R.drawable.expreso)
-    var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
-    val options = optionsWithImages.keys.toList()
-    val icons = remember { mutableStateListOf(R.drawable.ic_add) }
-    val scrollState = rememberScrollState()
-
     if (showPopup) {
         Dialog(
             onDismissRequest = onDismiss,
-            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false
+            )
         ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(450.dp) // Altura fija para el popup
+            ) {
                 Card(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 8.dp,
-                        pressedElevation = 4.dp,
-                        focusedElevation = 4.dp
-                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
-                        .align(Alignment.BottomEnd)
-                        .height(400.dp)
+                        .height(400.dp) // Altura fija para garantizar el comportamiento
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(scrollState)
+                    val expandedOptionIndex = remember { mutableStateOf<Int?>(null) }
+                    val listState = rememberLazyListState()
+
+                    // Desplazamiento automático al expandir una opción
+                    LaunchedEffect(expandedOptionIndex.value) {
+                        expandedOptionIndex.value?.let { index ->
+                            listState.animateScrollToItem(index)
+                        }
+                    }
+
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        options.forEachIndexed { index, option ->
-                            if (icons.size <= index) {
-                                icons.add(R.drawable.ic_add)
-                            }
-                            AnimatedVisibility(visible = expandedOptionIndex == null || expandedOptionIndex == index) {
-                                Column {
-                                    Column {
-                                        Button(
-                                            onClick = {
-                                                expandedOptionIndex = if (expandedOptionIndex == index) null else index
-                                                // Alternar entre los íconos
-                                                icons[index] = if (icons[index] == R.drawable.ic_add) {
-                                                    R.drawable.ic_remove
-                                                } else {
-                                                    R.drawable.ic_add
-                                                }
-                                            },
-                                            modifier = Modifier
-                                                .fillMaxWidth() // Fill the width of the popup
-                                                .height(71.dp), // Set the height of the button
-                                            colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                            contentPadding = PaddingValues(0.dp),
-                                            shape = RectangleShape
-                                        ) {
-                                            Column {
-                                                Row(
-                                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                                    modifier = Modifier.fillMaxWidth()
-                                                ) {
-                                                    // Icon and Text on the left
-                                                    Row(modifier = Modifier.padding(start = 16.dp)) {
-                                                        Image(
-                                                            painter = painterResource(id = optionsWithImages[option] ?: R.drawable.comunico),
-                                                            contentDescription = null,
-                                                            modifier = Modifier
-                                                                .height(30.dp)
-                                                        )
-                                                    }
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Column(
-                                                        modifier = Modifier.weight(1f),
-                                                        verticalArrangement = Arrangement.Center
-                                                    ) {
-                                                        Text(
-                                                            text = option,
-                                                            color = Color.Black,
-                                                            fontSize = 16.sp,
-                                                            textAlign = TextAlign.Start,
-                                                            fontWeight = FontWeight.Bold
-                                                        )
-                                                        Text(
-                                                            text = "Zona",
-                                                            color = Color.Black
-                                                        )
-                                                    }
-                                                    // Icon on the right
-                                                    Image(
-                                                        painter = painterResource(id = icons[index]),
-                                                        contentDescription = null,
-                                                        modifier = Modifier
-                                                            .size(40.dp)
-                                                            .align(Alignment.CenterVertically)
-                                                            .padding(end = 16.dp)
-                                                    )
-                                                }
-                                            }
+                        itemsIndexed(optionsWithImages.entries.toList()) { index, entry ->
+                            val option = entry.key
+                            val imageRes = entry.value
+                            val isExpanded = expandedOptionIndex.value == index
+
+                            if (expandedOptionIndex.value == null || isExpanded) {
+                                // Mostrar la fila y el contenido expandido solo si está expandida o ninguna está seleccionada
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(if (isExpanded) 400.dp else 71.dp) // Expandido ocupa todo el espacio
+                                ) {
+                                    OptionRow(
+                                        option = option,
+                                        imageRes = imageRes,
+                                        isExpanded = isExpanded,
+                                        onToggle = {
+                                            expandedOptionIndex.value = if (isExpanded) null else index
                                         }
-                                    }
+                                    )
 
-                                    AnimatedVisibility(visible = expandedOptionIndex == index) {
-                                        Box {
-                                            Column {
-                                                Row {
-                                                    Image(
-                                                        painter = activityImage,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.width(400.dp).height(188.dp)
-                                                    )
-                                                }
-                                                Row (modifier = Modifier.padding(top = 20.dp)) {
-                                                    Text(
-                                                        text = "Relieve",
-                                                        modifier = Modifier.padding(start = 16.dp),
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                                Row {
-                                                    Text(
-                                                        text = "Crea divertidas figuras de la naturaleza en nuestra pared de clavos.",
-                                                        modifier = Modifier.padding(start = 16.dp)
-                                                    )
-                                                }
-                                                Column { // Column with icons and button
-                                                    Row( // Row for icons
-                                                        verticalAlignment = Alignment.CenterVertically, // Align icons vertically
-                                                        modifier = Modifier.padding(start = 16.dp) // Add padding to the start
-                                                    ) {
-                                                        // Estados para controlar el ícono activo (filled o outlined)
-                                                        var isFavoriteFilled by remember { mutableStateOf(false) }
-                                                        var isThumbUpFilled by remember { mutableStateOf(false) }
-                                                        var isThumbDownFilled by remember { mutableStateOf(false) }
-
-                                                        Button(
-                                                            onClick = { isFavoriteFilled = !isFavoriteFilled },
-                                                            modifier = Modifier.size(40.dp), // Ajusta el tamaño del botón
-                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                                            contentPadding = PaddingValues(0.dp) // Elimina el relleno interno
-                                                        ) {
-                                                            Icon(
-                                                                painter = if (isFavoriteFilled) painterResource(id = R.drawable.favorite_filled) else painterResource(id = R.drawable.favorite),
-                                                                contentDescription = null,
-                                                                modifier = Modifier.size(24.dp), // Ajusta el tamaño del ícono
-                                                                tint = Color.Black // color negro
-                                                            )
-                                                        }
-                                                        Spacer(modifier = Modifier.width(8.dp)) // Añade espacio entre los botones
-
-                                                        Button(
-                                                            onClick = {
-                                                                isThumbUpFilled = !isThumbUpFilled
-                                                                if (isThumbUpFilled) isThumbDownFilled = false // Desactiva el otro botón
-                                                                      },
-                                                            modifier = Modifier.size(40.dp),
-                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                                            contentPadding = PaddingValues(0.dp)
-                                                        ) {
-                                                            Icon(
-                                                                painter = if (isThumbUpFilled) painterResource(id = R.drawable.thumb_up_filled) else painterResource(id = R.drawable.thumb_up),
-                                                                contentDescription = null,
-                                                                modifier = Modifier.size(24.dp),
-                                                                tint = Color.Black
-                                                            )
-                                                        }
-                                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                                        Button(
-                                                            onClick = {
-                                                                isThumbDownFilled = !isThumbDownFilled
-                                                                if (isThumbDownFilled) isThumbUpFilled = false // Desactiva el otro botón
-                                                                      },
-                                                            modifier = Modifier.size(40.dp),
-                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                                            contentPadding = PaddingValues(0.dp)
-                                                        ) {
-                                                            Icon(
-                                                                painter = if (isThumbDownFilled) painterResource(id = R.drawable.thumb_down_filled) else painterResource(id = R.drawable.thumb_down),
-                                                                contentDescription = null,
-                                                                modifier = Modifier.size(24.dp),
-                                                                tint = Color.Black
-                                                            )
-                                                        }
-                                                        Spacer(modifier = Modifier.padding(start = 135.dp)) // Espacio entre botones y el botón "Regresar"
-
-//                                                        Button(
-//                                                            onClick = { /* Acción para el botón Regresar */ },
-//                                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC4D600))
-//                                                        ) {
-//                                                            Text("Listo", color = Color.Black)
-//                                                        }
-                                                    }
-                                                }
-
-                                            }
-                                        }
+                                    if (isExpanded) {
+                                        ExpandedContent()
                                     }
                                 }
                             }
@@ -396,17 +264,143 @@ fun InfoPopup(
     }
 }
 
-//fun toggleFavorite(isFavoriteFilled: MutableState<Boolean>) {
-//    isFavoriteFilled.value = !isFavoriteFilled.value
-//}
-//
-//fun toggleThumbUp(isThumbUpFilled: MutableState<Boolean>) {
-//    isThumbUpFilled.value = !isThumbUpFilled.value
-//}
-//
-//fun toggleThumbDown(isThumbDownFilled: MutableState<Boolean>) {
-//    isThumbDownFilled.value = !isThumbDownFilled.value
-//}
+
+
+@Composable
+fun OptionRow(
+    option: String,
+    imageRes: Int,
+    isExpanded: Boolean,
+    onToggle: () -> Unit
+) {
+    Button(
+        onClick = onToggle,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(71.dp),
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        contentPadding = PaddingValues(0.dp),
+        shape = RectangleShape
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            // Imagen del recurso asociado a la opción
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
+                modifier = Modifier.height(30.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Nombre de la opción
+            Text(
+                text = option,
+                color = Color.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Ícono para expandir o contraer
+            Icon(
+                painter = painterResource(
+                    id = if (isExpanded) R.drawable.ic_remove else R.drawable.ic_add
+                ),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = Color.Black
+            )
+        }
+    }
+}
+
+
+@Composable
+fun ExpandedContent() {
+    Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 1.dp)) {
+        Image(
+            painter = painterResource(id = R.drawable.media),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth().height(200.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Relieve",
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "Crea divertidas figuras de la naturaleza en nuestra pared de clavos."
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        InteractionButtons()
+    }
+}
+
+@Composable
+fun InteractionButtons() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val isFavorite = remember { mutableStateOf(false) }
+        val isThumbUp = remember { mutableStateOf(false) }
+        val isThumbDown = remember { mutableStateOf(false) }
+
+        IconToggleButton(
+            checked = isFavorite.value,
+            onCheckedChange = { isFavorite.value = it },
+            modifier = Modifier.size(30.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (isFavorite.value) R.drawable.favorite_filled else R.drawable.favorite
+                ),
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        IconToggleButton(
+            checked = isThumbUp.value,
+            onCheckedChange = {
+                isThumbUp.value = it
+                if (it) isThumbDown.value = false
+            },
+            modifier = Modifier.size(30.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (isThumbUp.value) R.drawable.thumb_up_filled else R.drawable.thumb_up
+                ),
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        IconToggleButton(
+            checked = isThumbDown.value,
+            onCheckedChange = {
+                isThumbDown.value = it
+                if (it) isThumbUp.value = false
+            },
+            modifier = Modifier.size(30.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (isThumbDown.value) R.drawable.thumb_down_filled else R.drawable.thumb_down
+                ),
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
+    }
+}
 
 
 // Función para verificar si un punto está dentro de un polígono
@@ -983,6 +977,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 drawPath(path = path, color = areaColors[index].value.copy(alpha = 0.9f))
             }
         }
+        // ActividadesPopUp
         InfoPopup(
             showPopup = showPopup,
             optionsWithImages = mapOf(
@@ -992,9 +987,6 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 "Pertenezco" to R.drawable.pertenezco,
                 "Pequeños" to R.drawable.pequenos,
                 "Comunico" to R.drawable.comunico,
-                "Innovo" to R.drawable.expreso, //Actividad de prueba
-                "Juego" to R.drawable.expreso, //Actividad de prueba
-                "Descubro" to R.drawable.expreso //Actividad de prueba
             ),
             onDismiss = { showPopup = false }
         )
