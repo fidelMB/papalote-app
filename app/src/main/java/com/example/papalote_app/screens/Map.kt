@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.papalote_app.model.UserData
+//import com.example.papalote_app.model.UserData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -52,7 +52,7 @@ data class PolygonArea(
 )
 
 @Composable
-fun Map(userData: UserData) {
+fun Map() {
 
     // Estados para las pestañas
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -68,6 +68,16 @@ fun Map(userData: UserData) {
         Pair("Comunico", R.drawable.comunico)
     )
 
+    // Relación entre tabs y pisos
+    val tabToFloorMap = mapOf(
+        "Expreso" to 2, // S2
+        "Soy" to 2,     // S2
+        "Comprendo" to 2, // S2
+        "Pertenezco" to 1, // S1
+        "Pequeños" to 1, // S1
+        "Comunico" to 1  // S1
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -75,14 +85,22 @@ fun Map(userData: UserData) {
             .background(Color.White)
     ) {
         Column {
-            // Contenido principal del mapa
+            // Actualizar el piso automáticamente según la pestaña seleccionada
+            LaunchedEffect(selectedTopTabIndex) {
+                val selectedTabLabel = topTabs[selectedTopTabIndex].first
+                selectedTabIndex = tabToFloorMap[selectedTabLabel] ?: 0 // Piso predeterminado PB
+            }
+
+            // Contenido principal del mapa basado en el piso
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTabIndex) {
-                    0 -> PisoContent(piso = 0) // Contenido del Piso PB
-                    1 -> PisoContent(piso = 1) // Contenido del Piso S1
-                    2 -> PisoContent(piso = 2) // Contenido del Piso S2
+                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
+                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
+                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
                 }
             }
+
+
         }
         // Contenido principal
         Column (
@@ -178,7 +196,9 @@ fun Map(userData: UserData) {
                 pisos.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
+                        onClick = {
+                                    selectedTabIndex = index // Cambiar el piso
+                                  },
                         text = { Text(title, fontSize = 12.sp) }
                     )
                 }
@@ -697,7 +717,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(681f, 491f), Offset(658f, 482f), Offset(649f, 411f), Offset(531f, 382f),
                 Offset(523f, 373f), Offset(525f, 308f), Offset(486f, 305f)
             ),
-            initialColor = Color.DarkGray, //DarkGreen
+            initialColor = Color(0xFF8ECA48), //DarkGreen
             label = "DarkedZone",
             onClick = { /* Acción para DarkedZone */ },
             initialOffset = Offset(20f, 400f)
@@ -707,8 +727,8 @@ fun sotano1(): List<PolygonArea> {
                 Offset(330f, 543f), Offset(427f, 544f), Offset(426f, 557f), Offset(539f, 685f),
                 Offset(592f, 690f), Offset(593f, 775f), Offset(502f, 774f), Offset(484f, 766f)
             ),
-            initialColor = Color.DarkGray,
-            label = "DarkedZone",
+            initialColor = Color(0xFF286EBB),
+            label = "Zona Comunico",
             onClick = { /* Acción para DarkedZone */ },
             initialOffset = Offset(20f, 400f)
         )
@@ -928,7 +948,11 @@ fun sotano2(): List<PolygonArea> {
 }
 
 @Composable
-fun MapaInteractivo(areas: List<PolygonArea>) {
+fun MapaInteractivo(
+    areas: List<PolygonArea>,
+    selectedTopTabIndex: Int,
+    topTabs: List<Pair<String, Int>>
+) {
     val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
@@ -937,18 +961,32 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
     var showPopup by remember { mutableStateOf(false) }
     var selectedAreaLabel by remember { mutableStateOf("") }
 
+    // Relación entre tabs y las áreas que tendrán marcos
+    val tabToAreasMap = mapOf(
+        "Expreso" to listOf("Relieve"),
+        "Soy" to listOf("Decidir"),
+        "Comprendo" to listOf("Baylab"),
+        "Pertenezco" to listOf("Energía"),
+        "Pequeños" to listOf("Barco","Submarino"),
+        "Comunico" to listOf("Zona Comunico"),
+        "Empty" to listOf()
+    )
+
+    // Lista de nombres de áreas que deben tener marco según el tab seleccionado
+    val selectedTabLabel = topTabs[selectedTopTabIndex].first
+    val areasConMarco = tabToAreasMap[selectedTabLabel] ?: emptyList()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFC4D600)) // Fondo Mapa interactivo verde 0xFFC4D600
-            .clipToBounds() // Recorta cualquier parte del mapa que sobresalga
+            .background(Color(0xFFC4D600))
+            .clipToBounds()
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
                     scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
                     val adjustedPan = pan * scale.floatValue
                     offset.value += adjustedPan + (centroid * (1 - zoom))
                 }
-
             }
     ) {
         Canvas(
@@ -957,13 +995,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 .pointerInput(Unit) {
                     detectTapGestures { tapOffset ->
                         areas.forEachIndexed { index, area ->
-                            // Verifica si el área es decorativa y no debe reaccionar a clics
-                            if (area.label !in listOf(
-                                    "Background",
-                                    "DarkedZone",
-                                    "Área de Alimentos Exterior"
-                                )
-                            ) {
+                            if (area.label !in listOf("Background", "DarkedZone", "Área de Alimentos Exterior")) {
                                 val transformedPoints = area.points.map { point ->
                                     Offset(
                                         x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
@@ -984,6 +1016,7 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                     }
                 }
         ) {
+            // Dibujar los polígonos primero
             areas.forEachIndexed { index, area ->
                 val path = Path().apply {
                     val transformedPoints = area.points.map { point ->
@@ -996,9 +1029,41 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                     transformedPoints.drop(1).forEach { lineTo(it.x, it.y) }
                     close()
                 }
-                drawPath(path = path, color = areaColors[index].value.copy(alpha = 0.9f))
+
+                // Dibuja el relleno del polígono
+                drawPath(
+                    path = path,
+                    color = areaColors[index].value.copy(alpha = 0.9f)
+                )
+            }
+
+            // Dibujar los marcos después
+            areas.forEachIndexed { index, area ->
+                val path = Path().apply {
+                    val transformedPoints = area.points.map { point ->
+                        Offset(
+                            x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
+                            y = (point.y + area.initialOffset.y) * scale.floatValue + offset.value.y
+                        )
+                    }
+                    moveTo(transformedPoints.first().x, transformedPoints.first().y)
+                    transformedPoints.drop(1).forEach { lineTo(it.x, it.y) }
+                    close()
+                }
+
+                // Dibujar el marco si el área pertenece a `areasConMarco`
+                if (area.label in areasConMarco) {
+                    drawPath(
+                        path = path,
+                        color = Color.White, // Color del marco
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(
+                            width = 3.dp.toPx() // Grosor del marco
+                        )
+                    )
+                }
             }
         }
+
         // ActividadesPopUp
         InfoPopup(
             showPopup = showPopup,
@@ -1008,28 +1073,26 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 "Comprendo" to R.drawable.comprendo,
                 "Pertenezco" to R.drawable.pertenezco,
                 "Pequeños" to R.drawable.pequenos,
-                "Comunico" to R.drawable.comunico,
-                "Otra" to R.drawable.pequenos,
-                "Otra2" to R.drawable.comunico,
-                "Otra3" to R.drawable.pertenezco,
+                "Comunico" to R.drawable.comunico
             ),
             onDismiss = { showPopup = false }
         )
     }
 }
 
+
 @Composable
-fun PisoContent(piso: Int) {
+fun PisoContent(piso: Int, selectedTopTabIndex: Int, topTabs: List<Pair<String, Int>>) {
     val areas = when (piso) {
-        0 -> plantaBaja() // Contenido del Piso 1
-        1 -> sotano1() // Contenido del Piso 2
-        2 -> sotano2() // Contenido del Piso 3
+        0 -> plantaBaja()
+        1 -> sotano1()
+        2 -> sotano2()
         else -> emptyList()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Llama a la función que contiene la lógica de mapa y polígonos con las áreas del piso actual
-        MapaInteractivo(areas = areas)
+        MapaInteractivo(areas = areas, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
     }
 }
+
 
