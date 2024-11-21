@@ -29,6 +29,7 @@ import com.example.papalote_app.components.NavBar
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.papalote_app.components.ProfileViewModel
 import com.example.papalote_app.features.auth.AuthNavigation
 import com.example.papalote_app.features.auth.AuthUiState
 import com.example.papalote_app.features.auth.AuthViewModel

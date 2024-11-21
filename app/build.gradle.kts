@@ -49,6 +49,7 @@ android {
 dependencies {
     implementation ("androidx.compose.material:material-icons-extended:1.0.0")
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("io.coil-kt:coil-compose:1.4.0")
 
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")

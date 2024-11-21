@@ -22,6 +22,7 @@ import com.example.papalote_app.components.ActivityPopUp
 import com.example.papalote_app.model.Activity
 import com.example.papalote_app.model.getActivities
 import com.example.papalote_app.components.FavoriteCard
+import com.example.papalote_app.model.UserData
 
 
 @Composable
