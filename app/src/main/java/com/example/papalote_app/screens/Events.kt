@@ -7,19 +7,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.papalote_app.components.EventCard
+import com.example.papalote_app.features.notifications.NotificationsViewModel
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.model.getEvents
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun Events(navController: NavController) {
+fun Events(userData: UserData, firestore: FirebaseFirestore) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -40,8 +45,8 @@ fun Events(navController: NavController) {
 
             // lazy column that calls events from the event collection
             LazyColumn {
-                items(items = getEvents()) { event ->
-                    EventCard(event)
+                items(items = userData.events) { event ->
+                    EventCard(event = event, firestore = firestore, userData = userData)
                 }
 
             }

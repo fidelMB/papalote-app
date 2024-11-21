@@ -60,6 +60,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
     // Código QR
     implementation("androidx.camera:camera-camera2:1.3.0-alpha04")
     implementation("androidx.camera:camera-lifecycle:1.3.0-alpha04")
@@ -67,7 +68,6 @@ dependencies {
     implementation("com.google.mlkit:barcode-scanning:17.0.3")
     implementation("com.google.guava:guava:16.0.1")
     implementation("com.google.accompanist:accompanist-permissions:0.36.0")
-
 
 
     implementation(libs.androidx.core.ktx)

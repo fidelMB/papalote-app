@@ -6,14 +6,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.papalote_app.model.UserProfile
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.screens.*
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun MainNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    userData: UserData,
+    firestore: FirebaseFirestore
 ) {
     NavHost(
         navController = navController,
@@ -21,27 +24,34 @@ fun MainNavigation(
         modifier = modifier
     ) {
         composable(Screen.Events.route) {
-            Events(navController = navController)
+            Events(
+                userData = userData,
+                firestore = firestore
+            )
         }
 
         composable(Screen.Map.route) {
-            Map(navController = navController)
+            Map(
+                userData = userData
+            )
         }
 
         composable(Screen.QR.route) {
-            QR()
+            QR(
+                userData = userData
+            )
         }
 
         composable(Screen.Favorites.route) {
-            Favorites()
+            Favorites(
+                userData = userData
+            )
         }
 
         composable(Screen.Profile.route) {
-            val user = UserProfile(name = "John Doe", email = "johndoe@example.com", phone = "123-456-7890", url="img")
             Profile(
-                navController = navController,
                 onSignOut = onSignOut,
-                user = user
+                userData = userData
             )
         }
     }
