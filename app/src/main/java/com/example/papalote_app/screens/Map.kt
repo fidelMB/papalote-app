@@ -296,16 +296,12 @@ fun OptionRow(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            // Imagen del recurso asociado a la opción
             Image(
                 painter = painterResource(id = imageRes),
                 contentDescription = null,
                 modifier = Modifier.height(30.dp)
             )
-
             Spacer(modifier = Modifier.width(8.dp))
-
-            // Nombre de la opción
             Text(
                 text = option,
                 color = Color.Black,
@@ -313,8 +309,6 @@ fun OptionRow(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
             )
-
-            // Ícono para expandir o contraer
             Icon(
                 painter = painterResource(
                     id = if (isExpanded) R.drawable.ic_remove else R.drawable.ic_add
@@ -408,7 +402,6 @@ fun InteractionButtons() {
         }
     }
 }
-
 
 // Función para verificar si un punto está dentro de un polígono
 fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
@@ -594,7 +587,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(286f, 88f), Offset(288f, 125f), Offset(385f, 124f), Offset(384f, 88f)
+                Offset(288f, 88f),
+                Offset(288f, 125f),
+                Offset(385f, 125f),
+                Offset(385f, 88f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area3",
@@ -603,7 +599,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(396f, 89f), Offset(398f, 114f), Offset(456f, 115f), Offset(456f, 89f)
+                Offset(398f, 89f),
+                Offset(398f, 115f),
+                Offset(456f, 115f),
+                Offset(456f, 89f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area7",
@@ -612,7 +611,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(152f, 88f), Offset(152f, 112f), Offset(252f, 111f), Offset(252f, 88f)
+                Offset(152f, 88f),
+                Offset(152f, 112f),
+                Offset(252f, 112f),
+                Offset(252f, 88f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Acceso IMAX",
@@ -621,7 +623,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(80f, 358f), Offset(78f, 382f), Offset(99f, 383f), Offset(101f, 359f)
+                Offset(80f, 358f),
+                Offset(80f, 383f),
+                Offset(99f, 383f),
+                Offset(99f, 358f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area2",
@@ -630,7 +635,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(186f, 449f), Offset(186f, 472f), Offset(207f, 474f), Offset(207f, 452f)
+                Offset(186f, 449f),
+                Offset(186f, 472f),
+                Offset(207f, 472f),
+                Offset(207f, 449f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area2",
@@ -639,7 +647,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(111f, 362f), Offset(110f, 378f), Offset(127f, 379f), Offset(129f, 362f)
+                Offset(111f, 362f),
+                Offset(111f, 378f),
+                Offset(129f, 378f),
+                Offset(129f, 362f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area8",
@@ -648,7 +659,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(402f, 126f), Offset(402f, 141f), Offset(415f, 141f), Offset(415f, 127f)
+                Offset(402f, 126f),
+                Offset(402f, 141f),
+                Offset(415f, 141f),
+                Offset(415f, 126f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area4",
@@ -657,7 +671,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(191f, 139f), Offset(190f, 164f), Offset(209f, 163f), Offset(210f, 142f)
+                Offset(190f, 142f),
+                Offset(190f, 164f),
+                Offset(209f, 164f),
+                Offset(209f, 142f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area5",
@@ -666,7 +683,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(195f, 190f), Offset(194f, 209f), Offset(216f, 209f), Offset(216f, 189f)
+                Offset(195f, 190f),
+                Offset(195f, 209f),
+                Offset(216f, 209f),
+                Offset(216f, 190f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area6",
@@ -997,43 +1017,6 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
             ),
             onDismiss = { showPopup = false }
         )
-
-        // Botones de Zoom In y Zoom Out en la parte inferior derecha
-//        Column(
-//            modifier = Modifier
-//                .align(Alignment.BottomEnd)
-//                .padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//            FloatingActionButton(
-//                onClick = {
-//                    scale.floatValue = (scale.floatValue * 1.2f).coerceIn(1f, 5f)
-//                },
-//                modifier = Modifier.size(50.dp),
-//                containerColor = Color.White
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_zoom_in), // Asegúrate de que este recurso exista
-//                    contentDescription = "Zoom In",
-//                    tint = Color.Black
-//                )
-//            }
-//
-//            FloatingActionButton(
-//                onClick = {
-//                    scale.floatValue = (scale.floatValue / 1.2f).coerceIn(1f, 5f)
-//                },
-//                modifier = Modifier.size(50.dp),
-//                containerColor = Color.White
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_zoom_out), // Asegúrate de que este recurso exista
-//                    contentDescription = "Zoom Out",
-//                    tint = Color.Black
-//                )
-//            }
-//        }
-
     }
 }
 
