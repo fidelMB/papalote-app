@@ -1009,6 +1009,9 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 "Pertenezco" to R.drawable.pertenezco,
                 "Pequeños" to R.drawable.pequenos,
                 "Comunico" to R.drawable.comunico,
+                "Otra" to R.drawable.pequenos,
+                "Otra2" to R.drawable.comunico,
+                "Otra3" to R.drawable.pertenezco,
             ),
             onDismiss = { showPopup = false }
         )
