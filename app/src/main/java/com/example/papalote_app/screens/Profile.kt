@@ -1,7 +1,5 @@
 package com.example.papalote_app.screens
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,18 +22,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,28 +42,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.papalote_app.R
-import com.example.papalote_app.model.UserProfile
-import coil.compose.rememberImagePainter
 import com.example.papalote_app.model.UserData
 
 @Composable
 fun Profile(
     userData: UserData,
-    navController: NavController,
-    user: UserProfile,
     onSignOut: () -> Unit,
-    onImageChange: (Uri) -> Unit = {},  // Predeterminado vacío si no se usa
-    onDefaultImageSelect: (Int) -> Unit
 ) {
     val showDialog = remember { mutableStateOf(false) }
 
     // Opciones predeterminadas de imágenes
     val defaultImages = listOf(
+        R.drawable.avatar0,
         R.drawable.avatar1,
-        R.drawable.avatar2,
-        R.drawable.avatar3
+        R.drawable.avatar2
     )
 
     Box(
@@ -105,7 +91,7 @@ fun Profile(
                     // Usar la imagen según `profilePicture`
                     Image(
                         painter = painterResource(
-                            id = defaultImages[userData.profilePicture - 1]
+                            id = defaultImages[userData.profilePicture]
                         ),
                         contentDescription = "Profile picture",
                         contentScale = ContentScale.Crop,
@@ -176,7 +162,8 @@ fun Profile(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF1D1B20)
-                        )
+                        ),
+                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp)
                     )
 
                     Row(
@@ -192,18 +179,19 @@ fun Profile(
                                 modifier = Modifier
                                     .size(64.dp)
                                     .clickable {
-                                        userData.profilePicture = index + 1
-                                        onDefaultImageSelect(index + 1)
+                                        userData.profilePicture = index
+                                        //onDefaultImageSelect(index + 1)
                                         showDialog.value = false // Cierra el diálogo
                                     }
                                     .border(
                                         BorderStroke(
                                             2.dp,
-                                            if (userData.profilePicture == index + 1) Color.Green else Color.Gray
+                                            if (userData.profilePicture == index) Color.Green else Color.Gray
                                         ),
                                         shape = CircleShape
                                     )
-                                    .clip(CircleShape)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }
@@ -215,7 +203,7 @@ fun Profile(
                 onClick = onSignOut,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 24.dp),
+                    .padding(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFC4D600)
                 ),

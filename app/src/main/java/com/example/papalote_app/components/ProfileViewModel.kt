@@ -1,11 +1,9 @@
 package com.example.papalote_app.components
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.papalote_app.model.UserProfile
-import com.example.papalote_app.model.UserData
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
