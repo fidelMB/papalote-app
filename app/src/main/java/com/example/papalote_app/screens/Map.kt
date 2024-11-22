@@ -368,7 +368,10 @@ fun OptionRow(
 
 @Composable
 fun ExpandedContent() {
-    Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 1.dp)) {
+    Column(modifier = Modifier
+        .padding(horizontal = 10.dp, vertical = 1.dp)
+        .background(color = Color.White)
+    ) {
         Image(
             painter = painterResource(id = R.drawable.media),
             contentDescription = null,
@@ -377,10 +380,12 @@ fun ExpandedContent() {
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "Relieve",
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
         )
         Text(
-            text = "Crea divertidas figuras de la naturaleza en nuestra pared de clavos."
+            text = "Crea divertidas figuras de la naturaleza en nuestra pared de clavos.",
+            color = Color.Black
         )
         Spacer(modifier = Modifier.height(8.dp))
         InteractionButtons()
