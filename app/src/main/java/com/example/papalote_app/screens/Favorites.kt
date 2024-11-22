@@ -16,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.papalote_app.components.FavoriteCard
 import com.example.papalote_app.model.UserData
-import com.example.papalote_app.model.getActivities
 
 @Composable
 fun Favorites(userData: UserData) {

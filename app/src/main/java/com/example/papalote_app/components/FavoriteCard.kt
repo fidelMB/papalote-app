@@ -25,15 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.papalote_app.model.Activity
-import com.example.papalote_app.model.getActivities
 
 @Composable
-@Preview
-fun FavoriteCard(activity: Activity = getActivities()[1]) {
+fun FavoriteCard(activity: Activity) {
     Card(
         shape = RoundedCornerShape(corner = CornerSize(12.dp)),
         modifier = Modifier
