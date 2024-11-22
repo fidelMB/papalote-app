@@ -38,7 +38,8 @@ fun MainNavigation(
 
         composable(Screen.QR.route) {
             QR(
-                userData = userData
+                userData = userData,
+                firestore = firestore
             )
         }
 

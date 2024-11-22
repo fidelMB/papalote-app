@@ -25,11 +25,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import com.example.papalote_app.model.UserData
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,15 +40,19 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.example.papalote_app.R
 import com.example.papalote_app.components.BarcodeAnalyser
+import com.example.papalote_app.model.Activity
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.Executors
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun QR(userData: UserData) {
+fun QR(userData: UserData, firestore: FirebaseFirestore) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +72,7 @@ fun QR(userData: UserData) {
                     .size(300.dp)
                     .padding(bottom = 8.dp)
             )
-            PreviewViewComposable()
+            PreviewViewComposable(userData, firestore)
         }
     }
 }
@@ -76,10 +80,11 @@ fun QR(userData: UserData) {
 @kotlin.OptIn(ExperimentalPermissionsApi::class)
 @ExperimentalGetImage
 @Composable
-fun PreviewViewComposable() {
+fun PreviewViewComposable(userData: UserData, firestore: FirebaseFirestore) {
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val context = LocalContext.current
     val scannedQRCode = remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -121,6 +126,56 @@ fun PreviewViewComposable() {
                 .also {
                     it.setAnalyzer(cameraExecutor, BarcodeAnalyser { qrContent ->
                         scannedQRCode.value = qrContent
+                        var isAlreadyScanned = false
+
+                        for (activity in userData.activities) {
+                            if (activity.qr == qrContent) {
+                                isAlreadyScanned = true
+                            }
+                        }
+
+                        if (isAlreadyScanned == false) {
+                            coroutineScope.launch {
+                                firestore
+                                    .collection("activities")
+                                    .whereEqualTo("qr", qrContent)
+                                    .get()
+                                    .addOnSuccessListener { documents ->
+                                        for (document in documents) {
+                                            val scanActivity =
+                                                document.toObject(Activity::class.java)
+                                            userData.activities.add(scanActivity)
+                                        }
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        Log.d(
+                                            "QR Scanner",
+                                            "Failure getting activity with QR code",
+                                            exception
+                                        )
+                                    }
+                                    .await()
+
+                                firestore
+                                    .collection("users")
+                                    .document(userData.userId)
+                                    .update("activities", userData.activities)
+                                    .addOnSuccessListener {
+                                        Log.d(
+                                            "Activity Notification Firestore",
+                                            "Succesfully updated document with scanned activity"
+                                        )
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.w(
+                                            "Activity Notification Firestore",
+                                            "Error updating document",
+                                            e
+                                        )
+                                    }
+                                    .await()
+                            }
+                        }
 
                         // Open the URL in a browser
                         val intent = Intent(Intent.ACTION_VIEW).apply {
