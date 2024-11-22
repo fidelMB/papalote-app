@@ -25,14 +25,17 @@ import coil3.compose.AsyncImage
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.font.FontWeight
 import com.example.papalote_app.model.Activity
 @Composable
 fun ActivityPopUp(activity: Activity, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            colors = CardDefaults.cardColors(Color.White)
         ) {
             Column(
                 modifier = Modifier
@@ -85,8 +88,9 @@ fun ActivityPopUp(activity: Activity, onDismiss: () -> Unit) {
                     )
                     Text(
                         text = activity.zone,
-                        style = MaterialTheme.typography.bodyMedium
-
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF1D1B20),
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
@@ -95,7 +99,9 @@ fun ActivityPopUp(activity: Activity, onDismiss: () -> Unit) {
                 // Nombre del evento
                 Text(
                     text = activity.name,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color(0xFF1D1B20),
+                    fontWeight = FontWeight.Medium
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -103,7 +109,9 @@ fun ActivityPopUp(activity: Activity, onDismiss: () -> Unit) {
                 // Descripción del evento
                 Text(
                     text = activity.description,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF1D1B20),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

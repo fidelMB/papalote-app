@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +28,8 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.IconButton
 
 import androidx.compose.material.icons.filled.DateRange
-
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.text.font.FontWeight
 
 
 @Composable
@@ -37,7 +37,8 @@ fun EventDialog(event: Event, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            colors = CardDefaults.cardColors(Color.White)
         ) {
             Column(
                 modifier = Modifier
@@ -85,8 +86,10 @@ fun EventDialog(event: Event, onDismiss: () -> Unit) {
                         modifier = Modifier.padding(end = 4.dp)
                     )
                     Text(
-                        text = event.date,
-                        style = MaterialTheme.typography.bodyMedium
+                        text = event.date.uppercase(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF1D1B20),
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
@@ -104,8 +107,9 @@ fun EventDialog(event: Event, onDismiss: () -> Unit) {
                     )
                     Text(
                         text = event.zone,
-                        style = MaterialTheme.typography.bodyMedium
-
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF1D1B20),
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
@@ -114,7 +118,8 @@ fun EventDialog(event: Event, onDismiss: () -> Unit) {
                 // Nombre del evento
                 Text(
                     text = event.name,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color(0xFF1D1B20),
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -122,7 +127,10 @@ fun EventDialog(event: Event, onDismiss: () -> Unit) {
                 // Descripción del evento
                 Text(
                     text = event.description,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF1D1B20),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
