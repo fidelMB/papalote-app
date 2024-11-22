@@ -78,6 +78,10 @@ fun Map() {
         "Comunico" to 1  // S1
     )
 
+
+    // Estado para mostrar/ocultar marcos
+    var showFrames by remember { mutableStateOf(true) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -94,9 +98,9 @@ fun Map() {
             // Contenido principal del mapa basado en el piso
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTabIndex) {
-                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
-                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
-                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
+                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames)
+                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames)
+                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames)
                 }
             }
 
@@ -117,6 +121,7 @@ fun Map() {
                     .padding(32.dp, 16.dp, 32.dp, 0.dp)
                     .height(44.dp)
             )
+
             // Scrollable TabRow superior
             ScrollableTabRow(
                 selectedTabIndex = selectedTopTabIndex,
@@ -169,8 +174,31 @@ fun Map() {
                 }
             }
 
-
         }
+        //Boton para desactivar marcos
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Button(
+                onClick = { showFrames = !showFrames },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            ) {
+                Icon(
+                    painter = painterResource(
+                        id = if (showFrames) R.drawable.filter_list_off else R.drawable.filter_list
+                    ),
+                    contentDescription = if (showFrames) "Ocultar Filtros" else "Mostrar Filtros",
+                    modifier = Modifier
+                        .size(28.dp),
+                    tint = Color.Black
+                )
+            }
+        }
+
 
         // TabRow inferior (debajo del mapa)
         Box(
@@ -204,6 +232,7 @@ fun Map() {
                 }
             }
         }
+
     }
 }
 
@@ -951,7 +980,8 @@ fun sotano2(): List<PolygonArea> {
 fun MapaInteractivo(
     areas: List<PolygonArea>,
     selectedTopTabIndex: Int,
-    topTabs: List<Pair<String, Int>>
+    topTabs: List<Pair<String, Int>>,
+    showFrames: Boolean // Agregado correctamente
 ) {
     val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
@@ -967,12 +997,11 @@ fun MapaInteractivo(
         "Soy" to listOf("Decidir"),
         "Comprendo" to listOf("Baylab"),
         "Pertenezco" to listOf("Energía"),
-        "Pequeños" to listOf("Barco","Submarino"),
+        "Pequeños" to listOf("Barco", "Submarino"),
         "Comunico" to listOf("Zona Comunico"),
         "Empty" to listOf()
     )
 
-    // Lista de nombres de áreas que deben tener marco según el tab seleccionado
     val selectedTabLabel = topTabs[selectedTopTabIndex].first
     val areasConMarco = tabToAreasMap[selectedTabLabel] ?: emptyList()
 
@@ -989,6 +1018,7 @@ fun MapaInteractivo(
                 }
             }
     ) {
+        // Canvas para dibujar las áreas
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -1037,34 +1067,35 @@ fun MapaInteractivo(
                 )
             }
 
-            // Dibujar los marcos después
-            areas.forEachIndexed { index, area ->
-                val path = Path().apply {
-                    val transformedPoints = area.points.map { point ->
-                        Offset(
-                            x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
-                            y = (point.y + area.initialOffset.y) * scale.floatValue + offset.value.y
+            // Dibujar los marcos después, solo si `showFrames` está activado
+            if (showFrames) {
+                areas.forEachIndexed { index, area ->
+                    val path = Path().apply {
+                        val transformedPoints = area.points.map { point ->
+                            Offset(
+                                x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
+                                y = (point.y + area.initialOffset.y) * scale.floatValue + offset.value.y
+                            )
+                        }
+                        moveTo(transformedPoints.first().x, transformedPoints.first().y)
+                        transformedPoints.drop(1).forEach { lineTo(it.x, it.y) }
+                        close()
+                    }
+
+                    if (area.label in areasConMarco) {
+                        drawPath(
+                            path = path,
+                            color = Color.White, // Color del marco
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                width = 3.dp.toPx() // Grosor del marco
+                            )
                         )
                     }
-                    moveTo(transformedPoints.first().x, transformedPoints.first().y)
-                    transformedPoints.drop(1).forEach { lineTo(it.x, it.y) }
-                    close()
-                }
-
-                // Dibujar el marco si el área pertenece a `areasConMarco`
-                if (area.label in areasConMarco) {
-                    drawPath(
-                        path = path,
-                        color = Color.White, // Color del marco
-                        style = androidx.compose.ui.graphics.drawscope.Stroke(
-                            width = 3.dp.toPx() // Grosor del marco
-                        )
-                    )
                 }
             }
         }
 
-        // ActividadesPopUp
+        // Popup informativo
         InfoPopup(
             showPopup = showPopup,
             optionsWithImages = mapOf(
@@ -1081,8 +1112,15 @@ fun MapaInteractivo(
 }
 
 
+
 @Composable
-fun PisoContent(piso: Int, selectedTopTabIndex: Int, topTabs: List<Pair<String, Int>>) {
+fun PisoContent(
+    piso: Int,
+    selectedTopTabIndex: Int,
+    topTabs: List<Pair<String, Int>>,
+    showFrames: Boolean
+) {
+    // Selección de áreas según el piso
     val areas = when (piso) {
         0 -> plantaBaja()
         1 -> sotano1()
@@ -1090,9 +1128,17 @@ fun PisoContent(piso: Int, selectedTopTabIndex: Int, topTabs: List<Pair<String, 
         else -> emptyList()
     }
 
+    // Contenedor del contenido del piso
     Box(modifier = Modifier.fillMaxSize()) {
-        MapaInteractivo(areas = areas, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs)
+        MapaInteractivo(
+            areas = areas,
+            selectedTopTabIndex = selectedTopTabIndex,
+            topTabs = topTabs,
+            showFrames = showFrames // Pasar directamente el estado
+        )
     }
 }
+
+
 
 
