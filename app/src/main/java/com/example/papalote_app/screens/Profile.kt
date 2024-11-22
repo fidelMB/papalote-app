@@ -1,7 +1,10 @@
 package com.example.papalote_app.screens
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,15 +24,17 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -39,10 +44,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.papalote_app.R
 import com.example.papalote_app.model.UserData
-
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun Profile(userData: UserData, onSignOut: () -> Unit) {
+fun Profile(
+    userData: UserData,
+    onSignOut: () -> Unit,
+    firestore: FirebaseFirestore
+) {
+    val showDialog = remember { mutableStateOf(false) }
+
+    // Opciones predeterminadas de imágenes
+    val defaultImages = listOf(
+        R.drawable.avatar0,
+        R.drawable.avatar1,
+        R.drawable.avatar2
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,127 +78,169 @@ fun Profile(userData: UserData, onSignOut: () -> Unit) {
                 modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
             )
 
-            // Main content
-            Column(
+            // Imagen de perfil
+            Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                contentAlignment = Alignment.Center
             ) {
-                // Profile Image
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    contentAlignment = Alignment.Center
+                Surface(
+                    modifier = Modifier.size(120.dp),
+                    shape = CircleShape,
+                    border = BorderStroke(2.dp, Color.LightGray)
                 ) {
-                    Surface(
-                        modifier = Modifier.size(120.dp),
-                        shape = CircleShape,
-                        border = BorderStroke(2.dp, Color.LightGray)
-                    ) {
-                        Image(
-                            painter = painterResource(id = getDrawableResourceId("img")),
-                            contentDescription = "Profile picture",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                    // Edit Button
-                    IconButton(
-                        onClick = { /* Handle image change */ },
-                        modifier = Modifier
-                            .offset(x = 40.dp, y = 40.dp)
-                            .size(32.dp)
-                            .background(Color(0xFFC4D600), CircleShape)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Change profile picture",
-                            tint = Color(0XFF5C631D),
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
+                    // Usar la imagen según `profilePicture`
+                    Image(
+                        painter = painterResource(
+                            id = defaultImages[userData.profilePicture]
+                        ),
+                        contentDescription = "Profile picture",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
 
-                // Name
-                Text(
-                    text = userData.fullName,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF1D1B20)
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-
-                // Email Section
-                Row(
+                // Botón para editar la imagen
+                IconButton(
+                    onClick = { showDialog.value = true },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                        .offset(x = 40.dp, y = 40.dp)
+                        .size(32.dp)
+                        .background(Color(0xFFC4D600), CircleShape)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Email,
-                        contentDescription = "Email",
-                        tint = Color.Black,
-                        modifier = Modifier.size(20.dp)
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Change profile picture",
+                        tint = Color(0XFF5C631D),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            // Nombre y correo del usuario
+            Text(
+                text = userData.fullName,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF1D1B20)
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "Email",
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = userData.email,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
+            }
+
+            // Opciones predeterminadas (solo si se selecciona editar imagen)
+            if (showDialog.value) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    Text(
+                        text = "Selecciona un avatar predeterminado:",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1D1B20)
+                        ),
+                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        defaultImages.forEachIndexed { index, imageRes ->
+                            Image(
+                                painter = painterResource(id = imageRes),
+                                contentDescription = "Avatar $index",
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clickable {
+                                        userData.profilePicture = index
+
+                                        firestore
+                                            .collection("users")
+                                            .document(userData.userId)
+                                            .update("profilePicture", index)
+                                            .addOnSuccessListener {
+                                                Log.d("Profile picture update", "Successfully updated picture on firebase")
+                                            }
+                                            .addOnFailureListener { exception ->
+                                                Log.w("Profile picture update", "Failed to update profile picture on firebase", exception)
+
+                                            }
+
+                                        showDialog.value = false // Cierra el diálogo
+                                    }
+                                    .border(
+                                        BorderStroke(
+                                            2.dp,
+                                            color = if (userData.profilePicture == index) Color(0xFFC4D600) else Color.Gray
+                                        ),
+                                        shape = CircleShape
+                                    )
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Botón de cerrar sesión
+            Button(
+                onClick = onSignOut,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFC4D600)
+                ),
+                shape = RoundedCornerShape(40.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "Logout",
+                        tint = Color(0XFF5C631D)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = userData.email,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Black
+                        "Cerrar sesión",
+                        color = Color(0XFF5C631D)
                     )
-                }
-                // Divider below email
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    thickness = 1.dp,
-                    color = Color.Black
-                )
-
-                // Logout Button
-                Button(
-                    onClick = onSignOut,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFC4D600)
-                    ),
-                    shape = RoundedCornerShape(40.dp)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "Logout",
-                            tint = Color(0XFF5C631D)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Cerrar sesión",
-                            color = Color(0XFF5C631D)
-                        )
-                    }
                 }
             }
         }
     }
 }
 
-fun getDrawableResourceId(resourceName: String): Int {
-    return when (resourceName) {
-        "img" -> R.drawable.img
-        else -> R.drawable.img // Use the same image if you do not have a default one
-
-    }
-}

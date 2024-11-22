@@ -1,5 +1,7 @@
 package com.example.papalote_app.components
 
+import android.app.PendingIntent.getActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +15,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -29,17 +32,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.papalote_app.model.Activity
+
 import com.example.papalote_app.model.getActivities
 
+
 @Composable
-@Preview
-fun FavoriteCard(activity: Activity = getActivities()[1]) {
+fun FavoriteCard(activity: Activity = getActivities()[1], onClick:(Activity)->Unit) {
     Card(
         shape = RoundedCornerShape(corner = CornerSize(12.dp)),
         modifier = Modifier
             .fillMaxWidth()
             .height(110.dp)
-            .padding(16.dp, 8.dp, 16.dp, 8.dp),
+            .padding(16.dp, 8.dp, 16.dp, 8.dp)
+            .clickable { onClick(activity) } ,
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),
@@ -57,8 +62,8 @@ fun FavoriteCard(activity: Activity = getActivities()[1]) {
             ) {
                 AsyncImage(
                     model = activity.image,
-                    contentDescription = "Activity Image",
-                    contentScale = ContentScale.FillBounds
+                    contentDescription = "Event Image",
+                    contentScale = ContentScale.Crop
                 )
             }
 
@@ -67,16 +72,17 @@ fun FavoriteCard(activity: Activity = getActivities()[1]) {
                     .weight(1f)
                     .padding(16.dp, 10.dp, 16.dp, 10.dp)
             ) {
+
                 Text(
                     text = activity.name,
-                    style = MaterialTheme.typography.titleSmall.copy(
+                    style = MaterialTheme.typography.titleSmall.copy( // Smaller text size
                         color = Color(0xFF1D1B20),
                         fontWeight = FontWeight(500)
                     )
                 )
                 Text(
                     text = activity.zone,
-                    style = MaterialTheme.typography.bodySmall.copy(
+                    style = MaterialTheme.typography.bodySmall.copy( // Smaller text size
                         color = Color(0xFF615D67),
                         fontWeight = FontWeight(400)
                     )
@@ -84,11 +90,12 @@ fun FavoriteCard(activity: Activity = getActivities()[1]) {
             }
 
             Icon(
-                imageVector = Icons.Default.Favorite,
+                imageVector = Icons.Default.Notifications,
                 contentDescription = "Notification",
                 tint = Color.Black,
                 modifier = Modifier
                     .size(40.dp)
+                    .align(Alignment.CenterVertically)
                     .padding(end = 20.dp)
             )
         }

@@ -52,8 +52,10 @@ fun MainNavigation(
         composable(Screen.Profile.route) {
             Profile(
                 onSignOut = onSignOut,
-                userData = userData
+                userData = userData,
+                firestore = firestore
             )
         }
+
     }
 }
