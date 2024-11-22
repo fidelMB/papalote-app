@@ -38,9 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-//import com.example.papalote_app.model.UserData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+//import com.example.papalote_app.model.UserData
 
 // Datos de cada área poligonal
 data class PolygonArea(
@@ -1074,7 +1075,7 @@ fun MapaInteractivo(
 
             // Dibujar los marcos después, solo si `showFrames` está activado
             if (showFrames) {
-                areas.forEachIndexed { index, area ->
+                areas.forEachIndexed { _, area ->
                     val path = Path().apply {
                         val transformedPoints = area.points.map { point ->
                             Offset(
