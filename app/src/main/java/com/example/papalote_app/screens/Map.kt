@@ -190,7 +190,7 @@ fun Map(userData: UserData) {
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             ) {
                 Icon(
                     painter = painterResource(
@@ -230,8 +230,8 @@ fun Map(userData: UserData) {
                     Tab(
                         selected = selectedTabIndex == index,
                         onClick = {
-                                    selectedTabIndex = index // Cambiar el piso
-                                  },
+                            selectedTabIndex = index // Cambiar el piso
+                        },
                         text = { Text(title, fontSize = 12.sp) }
                     )
                 }
@@ -246,6 +246,7 @@ fun InfoPopup(
     showPopup: Boolean,
     optionsWithImages: Map<String, Int>,
     userData: UserData,
+    selectedZone: String?, // Nueva variable para la zona seleccionada
     onDismiss: () -> Unit,
 ) {
     if (showPopup) {
@@ -280,15 +281,16 @@ fun InfoPopup(
                         }
                     }
 
+                    // Filtrar actividades por zona seleccionada
+                    val filteredActivities = userData.activities.filter {
+                        selectedZone == null || it.zone == selectedZone
+                    }
+
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(items = userData.activities) { activity->
-//                            val option = entry.key
-                            val imageRes = activity.image
-                            val isExpanded = expandedOptionIndex.value == activity
-
+                        items(items = filteredActivities) { activity ->
                             val icon = when (activity.zone) {
                                 "Expreso" -> R.drawable.expreso
                                 "Soy" -> R.drawable.soy
@@ -297,33 +299,29 @@ fun InfoPopup(
                                 "Pertenezco" -> R.drawable.pertenezco
                                 else -> R.drawable.pequenos
                             }
+                            val isExpanded = expandedOptionIndex.value == activity
 
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(if (isExpanded) 400.dp else 71.dp)
+                            ) {
+                                OptionRow(
+                                    option = activity.name,
+                                    imageRes = icon,
+                                    isExpanded = isExpanded,
+                                    onToggle = {
+                                        expandedOptionIndex.value = if (isExpanded) null else activity
+                                    },
+                                    activity = activity
+                                )
 
-                            if (expandedOptionIndex.value == null || isExpanded) {
-                                // Mostrar la fila y el contenido expandido solo si está expandida o ninguna está seleccionada
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(if (isExpanded) 400.dp else 71.dp)
+                                AnimatedVisibility(
+                                    visible = isExpanded,
+                                    enter = expandVertically() + fadeIn(),
+                                    exit = shrinkVertically() + fadeOut()
                                 ) {
-                                    OptionRow(
-                                        option = activity.name,
-                                        imageRes = icon,
-                                        isExpanded = isExpanded,
-                                        onToggle = {
-                                            expandedOptionIndex.value = if (isExpanded) null else activity
-                                        },
-                                        activity = activity
-                                    )
-
-
-                                    AnimatedVisibility(
-                                        visible = isExpanded,
-                                        enter = expandVertically() + fadeIn(),
-                                        exit = shrinkVertically() + fadeOut()
-                                    ) {
-                                        ExpandedContent(activity = activity, userId = userData.userId)
-                                    }
+                                    ExpandedContent(activity = activity, userId = userData.userId)
                                 }
                             }
                         }
@@ -491,23 +489,23 @@ fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
 
 fun plantaBaja(): List<PolygonArea> {
     return listOf(
-            PolygonArea(
-                points = listOf(
-                    Offset(393f, 330f),
-                    Offset(392f, 423f),
-                    Offset(379f, 423f),
-                    Offset(379f, 437f),
-                    Offset(392f, 438f),
-                    Offset(393f, 456f),
-                    Offset(703f, 456f),
-                    Offset(702f, 332f)
-                ),
-                initialColor = Color.Gray,
-                label = "Área de Alimentos Exterior",
-                onClick = {  },
-                initialOffset = Offset(-60f, 400f)
+        PolygonArea(
+            points = listOf(
+                Offset(393f, 330f),
+                Offset(392f, 423f),
+                Offset(379f, 423f),
+                Offset(379f, 437f),
+                Offset(392f, 438f),
+                Offset(393f, 456f),
+                Offset(703f, 456f),
+                Offset(702f, 332f)
             ),
-            PolygonArea(
+            initialColor = Color.Gray,
+            label = "Área de Alimentos Exterior",
+            onClick = {  },
+            initialOffset = Offset(-60f, 400f)
+        ),
+        PolygonArea(
             points = listOf(
                 Offset(404f, 388f),
                 Offset(404f, 399f),
@@ -1014,7 +1012,7 @@ fun MapaInteractivo(
     val areaColors = remember { areas.map { mutableStateOf(it.initialColor) } }
 
     var showPopup by remember { mutableStateOf(false) }
-    var selectedAreaLabel by remember { mutableStateOf("") }
+    var selectedZone by remember { mutableStateOf<String?>(null) } // Zona seleccionada
 
     // Relación entre tabs y las áreas que tendrán marcos
     val tabToAreasMap = mapOf(
@@ -1064,7 +1062,15 @@ fun MapaInteractivo(
                                         areaColors[index].value = area.initialColor
                                     }
                                     showPopup = true
-                                    selectedAreaLabel = area.label
+                                    selectedZone = when (area.label) { // Zona seleccionada
+                                        "Relieve" -> "Expreso"
+                                        "Decidir" -> "Soy"
+                                        "Baylab" -> "Comprendo"
+                                        "Energía" -> "Pertenezco"
+                                        "Barco", "Submarino" -> "Pequeños"
+                                        "Zona Comunico" -> "Comunico"
+                                        else -> null
+                                    }
                                 }
                             }
                         }
@@ -1132,6 +1138,7 @@ fun MapaInteractivo(
                 "Comunico" to R.drawable.comunico
             ),
             userData = userData,
+            selectedZone = selectedZone, // Pasamos la zona seleccionada
             onDismiss = { showPopup = false }
         )
     }
@@ -1164,8 +1171,3 @@ fun PisoContent(
         )
     }
 }
-
-
-
-
-
