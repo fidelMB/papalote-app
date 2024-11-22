@@ -12,7 +12,7 @@ data class UserData(
     val fullName: String = "Cargando...",
     val gender: String = "Cargando...",
     var profilePicture: Int = 1,
-    var activities: List<Activity> = emptyList(),
+    var activities: MutableList<Activity> = mutableListOf<Activity>(),
     var events: List<Event> = emptyList()
 ) : Parcelable
 

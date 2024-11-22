@@ -138,19 +138,13 @@ class AuthViewModel : ViewModel() {
                 // 1. Crear usuario en Firebase Auth
                 val result = auth.createUserWithEmailAndPassword(email, password).await()
 
-                // 2. Obtener las actividades para asignarlas al usuario
-                val activities = firestore.collection("activities")
-                    .get()
-                    .await()
-                    .documents.map { document -> document.toObject(Activity::class.java)!! }
-
-                // 3. Obtener los eventos para asignarlos al usuario
+                // 2. Obtener los eventos para asignarlos al usuario
                 val events = firestore.collection("events")
                     .get()
                     .await()
                     .documents.map { document -> document.toObject(Event::class.java)!! }
 
-                // 4. Guardar información adicional en Firestore
+                // 3. Guardar información adicional en Firestore
                 result.user?.uid?.let { uid ->
                     firestore.collection(Constants.USERS_COLLECTION)
                         .document(uid)
@@ -161,7 +155,7 @@ class AuthViewModel : ViewModel() {
                                 "gender" to _formState.value.gender,
                                 "email" to email,
                                 "createdAt" to System.currentTimeMillis(),
-                                "activities" to activities,
+                                "activities" to mutableListOf<Activity>(),
                                 "events" to events
                             )
                         ).await()
@@ -172,7 +166,7 @@ class AuthViewModel : ViewModel() {
                         birthDate = _formState.value.birthDate.value,
                         gender = _formState.value.gender,
                         email = email,
-                        activities = activities,
+                        activities = mutableListOf<Activity>(),
                         events = events
                     )
                 }
