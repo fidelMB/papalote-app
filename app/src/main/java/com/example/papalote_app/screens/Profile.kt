@@ -1,5 +1,5 @@
 package com.example.papalote_app.screens
-import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,11 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.papalote_app.R
 import com.example.papalote_app.model.UserData
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun Profile(
     userData: UserData,
     onSignOut: () -> Unit,
+    firestore: FirebaseFirestore
 ) {
     val showDialog = remember { mutableStateOf(false) }
 
@@ -180,13 +182,25 @@ fun Profile(
                                     .size(64.dp)
                                     .clickable {
                                         userData.profilePicture = index
-                                        //onDefaultImageSelect(index + 1)
+
+                                        firestore
+                                            .collection("users")
+                                            .document(userData.userId)
+                                            .update("profilePicture", index)
+                                            .addOnSuccessListener {
+                                                Log.d("Profile picture update", "Successfully updated picture on firebase")
+                                            }
+                                            .addOnFailureListener { exception ->
+                                                Log.w("Profile picture update", "Failed to update profile picture on firebase", exception)
+
+                                            }
+
                                         showDialog.value = false // Cierra el diálogo
                                     }
                                     .border(
                                         BorderStroke(
                                             2.dp,
-                                            if (userData.profilePicture == index) Color.Green else Color.Gray
+                                            color = if (userData.profilePicture == index) Color(0xFFC4D600) else Color.Gray
                                         ),
                                         shape = CircleShape
                                     )
