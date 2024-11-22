@@ -41,7 +41,7 @@ import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-//import com.example.papalote_app.model.UserData
+import com.example.papalote_app.model.UserData
 
 // Datos de cada área poligonal
 data class PolygonArea(
@@ -53,7 +53,7 @@ data class PolygonArea(
 )
 
 @Composable
-fun Map() {
+fun Map(userData: UserData) {
 
     // Estados para las pestañas
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -99,9 +99,9 @@ fun Map() {
             // Contenido principal del mapa basado en el piso
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTabIndex) {
-                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames)
-                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames)
-                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames)
+                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
+                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
+                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
                 }
             }
 
@@ -241,6 +241,7 @@ fun Map() {
 fun InfoPopup(
     showPopup: Boolean,
     optionsWithImages: Map<String, Int>,
+    userData: UserData? = null,
     onDismiss: () -> Unit
 ) {
     if (showPopup) {
@@ -987,7 +988,8 @@ fun MapaInteractivo(
     areas: List<PolygonArea>,
     selectedTopTabIndex: Int,
     topTabs: List<Pair<String, Int>>,
-    showFrames: Boolean // Agregado correctamente
+    showFrames: Boolean,
+    userData: UserData
 ) {
     val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
@@ -1112,6 +1114,7 @@ fun MapaInteractivo(
                 "Pequeños" to R.drawable.pequenos,
                 "Comunico" to R.drawable.comunico
             ),
+            userData = userData,
             onDismiss = { showPopup = false }
         )
     }
@@ -1124,9 +1127,9 @@ fun PisoContent(
     piso: Int,
     selectedTopTabIndex: Int,
     topTabs: List<Pair<String, Int>>,
-    showFrames: Boolean
+    showFrames: Boolean,
+    userData: UserData // Nuevo parámetro
 ) {
-    // Selección de áreas según el piso
     val areas = when (piso) {
         0 -> plantaBaja()
         1 -> sotano1()
@@ -1134,16 +1137,17 @@ fun PisoContent(
         else -> emptyList()
     }
 
-    // Contenedor del contenido del piso
     Box(modifier = Modifier.fillMaxSize()) {
         MapaInteractivo(
             areas = areas,
             selectedTopTabIndex = selectedTopTabIndex,
             topTabs = topTabs,
-            showFrames = showFrames // Pasar directamente el estado
+            showFrames = showFrames,
+            userData = userData // Pasamos el userData
         )
     }
 }
+
 
 
 
