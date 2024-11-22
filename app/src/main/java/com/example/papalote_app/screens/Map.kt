@@ -15,6 +15,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,12 +33,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import coil3.compose.AsyncImage
+import com.example.papalote_app.model.Activity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -241,8 +245,8 @@ fun Map(userData: UserData) {
 fun InfoPopup(
     showPopup: Boolean,
     optionsWithImages: Map<String, Int>,
-    userData: UserData? = null,
-    onDismiss: () -> Unit
+    userData: UserData,
+    onDismiss: () -> Unit,
 ) {
     if (showPopup) {
         Dialog(
@@ -256,7 +260,7 @@ fun InfoPopup(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(450.dp) // Altura fija para el popup
+                    .height(450.dp)
             ) {
                 Card(
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -264,15 +268,15 @@ fun InfoPopup(
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
-                        .height(400.dp) // Altura fija para garantizar el comportamiento
+                        .height(400.dp)
                 ) {
-                    val expandedOptionIndex = remember { mutableStateOf<Int?>(null) }
+                    val expandedOptionIndex = remember { mutableStateOf<Activity?>(null) }
                     val listState = rememberLazyListState()
 
                     // Desplazamiento automático al expandir una opción
                     LaunchedEffect(expandedOptionIndex.value) {
-                        expandedOptionIndex.value?.let { index ->
-                            listState.animateScrollToItem(index)
+                        expandedOptionIndex.value?.let { activity ->
+                            listState.animateScrollToItem(userData.activities.indexOf(activity))
                         }
                     }
 
@@ -280,33 +284,45 @@ fun InfoPopup(
                         state = listState,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        itemsIndexed(optionsWithImages.entries.toList()) { index, entry ->
-                            val option = entry.key
-                            val imageRes = entry.value
-                            val isExpanded = expandedOptionIndex.value == index
+                        items(items = userData.activities) { activity->
+//                            val option = entry.key
+                            val imageRes = activity.image
+                            val isExpanded = expandedOptionIndex.value == activity
+
+                            val icon = when (activity.zone) {
+                                "Expreso" -> R.drawable.expreso
+                                "Soy" -> R.drawable.soy
+                                "Comunico" -> R.drawable.comunico
+                                "Comprendo" -> R.drawable.comprendo
+                                "Pertenezco" -> R.drawable.pertenezco
+                                else -> R.drawable.pequenos
+                            }
+
 
                             if (expandedOptionIndex.value == null || isExpanded) {
                                 // Mostrar la fila y el contenido expandido solo si está expandida o ninguna está seleccionada
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(if (isExpanded) 400.dp else 71.dp) // Expandido ocupa todo el espacio
+                                        .height(if (isExpanded) 400.dp else 71.dp)
                                 ) {
                                     OptionRow(
-                                        option = option,
-                                        imageRes = imageRes,
+                                        option = activity.name,
+                                        imageRes = icon,
                                         isExpanded = isExpanded,
                                         onToggle = {
-                                            expandedOptionIndex.value = if (isExpanded) null else index
-                                        }
+                                            expandedOptionIndex.value = if (isExpanded) null else activity
+                                        },
+                                        activity = activity
                                     )
+
 
                                     AnimatedVisibility(
                                         visible = isExpanded,
                                         enter = expandVertically() + fadeIn(),
                                         exit = shrinkVertically() + fadeOut()
                                     ) {
-                                        ExpandedContent()
+                                        ExpandedContent(activity = activity, userId = userData.userId)
                                     }
                                 }
                             }
@@ -324,7 +340,8 @@ fun OptionRow(
     option: String,
     imageRes: Int,
     isExpanded: Boolean,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    activity: Activity
 ) {
     Button(
         onClick = onToggle,
@@ -369,24 +386,24 @@ fun OptionRow(
 
 
 @Composable
-fun ExpandedContent() {
+fun ExpandedContent(activity: Activity, userId:String) {
     Column(modifier = Modifier
         .padding(horizontal = 10.dp, vertical = 1.dp)
         .background(color = Color.White)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.media),
-            contentDescription = null,
+        AsyncImage(
+            model = activity.image,
+            contentDescription = "Activity Image",
             modifier = Modifier.fillMaxWidth().height(200.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "Relieve",
+            text = activity.name,
             fontWeight = FontWeight.Bold,
             color = Color.Black
         )
         Text(
-            text = "Crea divertidas figuras de la naturaleza en nuestra pared de clavos.",
+            text = activity.description,
             color = Color.Black
         )
         Spacer(modifier = Modifier.height(8.dp))
