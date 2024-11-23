@@ -4,14 +4,6 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class UserProfile(
-    val name: String,
-    val email: String,
-    val phone: String,
-    val url: String,
-) : Parcelable
-
-@Parcelize
 data class UserData(
     var userId: String = "",
     val birthDate: String = "Cargando...",
@@ -20,6 +12,15 @@ data class UserData(
     val fullName: String = "Cargando...",
     val gender: String = "Cargando...",
     var profilePicture: Int = 1,
-    var activities: List<Activity> = emptyList(),
+    var activities: MutableList<Activity> = mutableListOf<Activity>(),
     var events: List<Event> = emptyList()
 ) : Parcelable
+
+@Parcelize
+data class UserProfile(
+    val name: String,
+    val email: String,
+    val phone: String,
+    val url: String,
+) : Parcelable
+

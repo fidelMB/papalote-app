@@ -47,6 +47,23 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.compose.material:material-icons-extended:1.0.0")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("io.coil-kt:coil-compose:1.4.0")
+
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
+    implementation ("androidx.core:core-ktx:1.7.0")
+    implementation ("androidx.appcompat:appcompat:1.4.0")
+    implementation ("androidx.compose.ui:ui:1.1.0-beta01")
+    implementation ("androidx.compose.material3:material3:1.0.0-alpha07")
+    implementation ("androidx.activity:activity-compose:1.4.0")
+    implementation ("androidx.navigation:navigation-compose:2.4.0-beta02")
+    implementation ("io.coil-kt:coil-compose:1.4.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
+    implementation ("androidx.activity:activity-ktx:1.2.3")
+    implementation ("androidx.fragment:fragment-ktx:1.3.5")
+
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     implementation("io.coil-kt.coil3:coil-compose:3.0.1")
@@ -61,6 +78,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    // Código QR
+    implementation("androidx.camera:camera-camera2:1.3.0-alpha04")
+    implementation("androidx.camera:camera-lifecycle:1.3.0-alpha04")
+    implementation("androidx.camera:camera-view:1.3.0-alpha04")
+    implementation("com.google.mlkit:barcode-scanning:17.0.3")
+    implementation("com.google.guava:guava:16.0.1")
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -71,6 +96,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.common.ktx)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
