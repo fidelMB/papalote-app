@@ -3,6 +3,10 @@ package com.example.papalote_app.screens
 import com.example.papalote_app.R
 import androidx.compose.runtime.Composable
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,9 +14,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -27,16 +33,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.papalote_app.model.UserData
+import coil3.compose.AsyncImage
+import com.example.papalote_app.model.Activity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+import com.example.papalote_app.model.UserData
 
 // Datos de cada área poligonal
 data class PolygonArea(
@@ -64,6 +73,20 @@ fun Map(userData: UserData) {
         Pair("Comunico", R.drawable.comunico)
     )
 
+    // Relación entre tabs y pisos
+    val tabToFloorMap = mapOf(
+        "Expreso" to 2, // S2
+        "Soy" to 2,     // S2
+        "Comprendo" to 2, // S2
+        "Pertenezco" to 1, // S1
+        "Pequeños" to 1, // S1
+        "Comunico" to 1  // S1
+    )
+
+
+    // Estado para mostrar/ocultar marcos
+    var showFrames by remember { mutableStateOf(true) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -71,14 +94,22 @@ fun Map(userData: UserData) {
             .background(Color.White)
     ) {
         Column {
-            // Contenido principal del mapa
+            // Actualizar el piso automáticamente según la pestaña seleccionada
+            LaunchedEffect(selectedTopTabIndex) {
+                val selectedTabLabel = topTabs[selectedTopTabIndex].first
+                selectedTabIndex = tabToFloorMap[selectedTabLabel] ?: 0 // Piso predeterminado PB
+            }
+
+            // Contenido principal del mapa basado en el piso
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTabIndex) {
-                    0 -> PisoContent(piso = 0) // Contenido del Piso PB
-                    1 -> PisoContent(piso = 1) // Contenido del Piso S1
-                    2 -> PisoContent(piso = 2) // Contenido del Piso S2
+                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
+                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
+                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
                 }
             }
+
+
         }
         // Contenido principal
         Column (
@@ -95,6 +126,7 @@ fun Map(userData: UserData) {
                     .padding(32.dp, 16.dp, 32.dp, 0.dp)
                     .height(44.dp)
             )
+
             // Scrollable TabRow superior
             ScrollableTabRow(
                 selectedTabIndex = selectedTopTabIndex,
@@ -147,8 +179,31 @@ fun Map(userData: UserData) {
                 }
             }
 
-
         }
+        //Boton para desactivar marcos
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Button(
+                onClick = { showFrames = !showFrames },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            ) {
+                Icon(
+                    painter = painterResource(
+                        id = if (showFrames) R.drawable.filter_list_off else R.drawable.filter_list
+                    ),
+                    contentDescription = if (showFrames) "Ocultar Filtros" else "Mostrar Filtros",
+                    modifier = Modifier
+                        .size(28.dp),
+                    tint = Color.Black
+                )
+            }
+        }
+
 
         // TabRow inferior (debajo del mapa)
         Box(
@@ -174,217 +229,99 @@ fun Map(userData: UserData) {
                 pisos.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
+                        onClick = {
+                            selectedTabIndex = index // Cambiar el piso
+                        },
                         text = { Text(title, fontSize = 12.sp) }
                     )
                 }
             }
         }
+
     }
 }
 
 @Composable
 fun InfoPopup(
     showPopup: Boolean,
-    optionsWithImages: Map<String, Int>, // Map que asocia opciones con imágenes
-    onDismiss: () -> Unit
+    optionsWithImages: Map<String, Int>,
+    userData: UserData,
+    selectedZone: String?, // Nueva variable para la zona seleccionada
+    onDismiss: () -> Unit,
 ) {
-    val activityImage = painterResource(id = R.drawable.media)
-//    val activityAreaIcon = painterResource(id = R.drawable.expreso)
-    var expandedOptionIndex by remember { mutableStateOf<Int?>(null) }
-    val options = optionsWithImages.keys.toList()
-    val icons = remember { mutableStateListOf(R.drawable.ic_add) }
-    val scrollState = rememberScrollState()
-
     if (showPopup) {
         Dialog(
             onDismissRequest = onDismiss,
-            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false
+            )
         ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(450.dp)
+            ) {
                 Card(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 8.dp,
-                        pressedElevation = 4.dp,
-                        focusedElevation = 4.dp
-                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
-                        .align(Alignment.BottomEnd)
                         .height(400.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(scrollState)
+                    val expandedOptionIndex = remember { mutableStateOf<Activity?>(null) }
+                    val listState = rememberLazyListState()
+
+                    // Desplazamiento automático al expandir una opción
+                    LaunchedEffect(expandedOptionIndex.value) {
+                        expandedOptionIndex.value?.let { activity ->
+                            listState.animateScrollToItem(userData.activities.indexOf(activity))
+                        }
+                    }
+
+                    // Filtrar actividades por zona seleccionada
+                    val filteredActivities = userData.activities.filter {
+                        selectedZone == null || it.zone == selectedZone
+                    }
+
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        options.forEachIndexed { index, option ->
-                            if (icons.size <= index) {
-                                icons.add(R.drawable.ic_add)
+                        items(items = filteredActivities) { activity ->
+                            val icon = when (activity.zone) {
+                                "Expreso" -> R.drawable.expreso
+                                "Soy" -> R.drawable.soy
+                                "Comunico" -> R.drawable.comunico
+                                "Comprendo" -> R.drawable.comprendo
+                                "Pertenezco" -> R.drawable.pertenezco
+                                else -> R.drawable.pequenos
                             }
-                            AnimatedVisibility(visible = expandedOptionIndex == null || expandedOptionIndex == index) {
-                                Column {
-                                    Column {
-                                        Button(
-                                            onClick = {
-                                                expandedOptionIndex = if (expandedOptionIndex == index) null else index
-                                                // Alternar entre los íconos
-                                                icons[index] = if (icons[index] == R.drawable.ic_add) {
-                                                    R.drawable.ic_remove
-                                                } else {
-                                                    R.drawable.ic_add
-                                                }
-                                            },
-                                            modifier = Modifier
-                                                .fillMaxWidth() // Fill the width of the popup
-                                                .height(71.dp), // Set the height of the button
-                                            colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                            contentPadding = PaddingValues(0.dp),
-                                            shape = RectangleShape
-                                        ) {
-                                            Column {
-                                                Row(
-                                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                                    modifier = Modifier.fillMaxWidth()
-                                                ) {
-                                                    // Icon and Text on the left
-                                                    Row(modifier = Modifier.padding(start = 16.dp)) {
-                                                        Image(
-                                                            painter = painterResource(id = optionsWithImages[option] ?: R.drawable.comunico),
-                                                            contentDescription = null,
-                                                            modifier = Modifier
-                                                                .height(30.dp)
-                                                        )
-                                                    }
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Column(
-                                                        modifier = Modifier.weight(1f),
-                                                        verticalArrangement = Arrangement.Center
-                                                    ) {
-                                                        Text(
-                                                            text = option,
-                                                            color = Color.Black,
-                                                            fontSize = 16.sp,
-                                                            textAlign = TextAlign.Start,
-                                                            fontWeight = FontWeight.Bold
-                                                        )
-                                                        Text(
-                                                            text = "Zona",
-                                                            color = Color.Black
-                                                        )
-                                                    }
-                                                    // Icon on the right
-                                                    Image(
-                                                        painter = painterResource(id = icons[index]),
-                                                        contentDescription = null,
-                                                        modifier = Modifier
-                                                            .size(40.dp)
-                                                            .align(Alignment.CenterVertically)
-                                                            .padding(end = 16.dp)
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
+                            val isExpanded = expandedOptionIndex.value == activity
 
-                                    AnimatedVisibility(visible = expandedOptionIndex == index) {
-                                        Box {
-                                            Column {
-                                                Row {
-                                                    Image(
-                                                        painter = activityImage,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.width(400.dp).height(188.dp)
-                                                    )
-                                                }
-                                                Row (modifier = Modifier.padding(top = 20.dp)) {
-                                                    Text(
-                                                        text = "Relieve",
-                                                        modifier = Modifier.padding(start = 16.dp),
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                                Row {
-                                                    Text(
-                                                        text = "Crea divertidas figuras de la naturaleza en nuestra pared de clavos.",
-                                                        modifier = Modifier.padding(start = 16.dp)
-                                                    )
-                                                }
-                                                Column { // Column with icons and button
-                                                    Row( // Row for icons
-                                                        verticalAlignment = Alignment.CenterVertically, // Align icons vertically
-                                                        modifier = Modifier.padding(start = 16.dp) // Add padding to the start
-                                                    ) {
-                                                        // Estados para controlar el ícono activo (filled o outlined)
-                                                        var isFavoriteFilled by remember { mutableStateOf(false) }
-                                                        var isThumbUpFilled by remember { mutableStateOf(false) }
-                                                        var isThumbDownFilled by remember { mutableStateOf(false) }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(if (isExpanded) 400.dp else 71.dp)
+                            ) {
+                                OptionRow(
+                                    option = activity.name,
+                                    imageRes = icon,
+                                    isExpanded = isExpanded,
+                                    onToggle = {
+                                        expandedOptionIndex.value = if (isExpanded) null else activity
+                                    },
+                                    activity = activity
+                                )
 
-                                                        Button(
-                                                            onClick = { isFavoriteFilled = !isFavoriteFilled },
-                                                            modifier = Modifier.size(40.dp), // Ajusta el tamaño del botón
-                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                                            contentPadding = PaddingValues(0.dp) // Elimina el relleno interno
-                                                        ) {
-                                                            Icon(
-                                                                painter = if (isFavoriteFilled) painterResource(id = R.drawable.favorite_filled) else painterResource(id = R.drawable.favorite),
-                                                                contentDescription = null,
-                                                                modifier = Modifier.size(24.dp), // Ajusta el tamaño del ícono
-                                                                tint = Color.Black // color negro
-                                                            )
-                                                        }
-                                                        Spacer(modifier = Modifier.width(8.dp)) // Añade espacio entre los botones
-
-                                                        Button(
-                                                            onClick = {
-                                                                isThumbUpFilled = !isThumbUpFilled
-                                                                if (isThumbUpFilled) isThumbDownFilled = false // Desactiva el otro botón
-                                                                      },
-                                                            modifier = Modifier.size(40.dp),
-                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                                            contentPadding = PaddingValues(0.dp)
-                                                        ) {
-                                                            Icon(
-                                                                painter = if (isThumbUpFilled) painterResource(id = R.drawable.thumb_up_filled) else painterResource(id = R.drawable.thumb_up),
-                                                                contentDescription = null,
-                                                                modifier = Modifier.size(24.dp),
-                                                                tint = Color.Black
-                                                            )
-                                                        }
-                                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                                        Button(
-                                                            onClick = {
-                                                                isThumbDownFilled = !isThumbDownFilled
-                                                                if (isThumbDownFilled) isThumbUpFilled = false // Desactiva el otro botón
-                                                                      },
-                                                            modifier = Modifier.size(40.dp),
-                                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                                            contentPadding = PaddingValues(0.dp)
-                                                        ) {
-                                                            Icon(
-                                                                painter = if (isThumbDownFilled) painterResource(id = R.drawable.thumb_down_filled) else painterResource(id = R.drawable.thumb_down),
-                                                                contentDescription = null,
-                                                                modifier = Modifier.size(24.dp),
-                                                                tint = Color.Black
-                                                            )
-                                                        }
-                                                        Spacer(modifier = Modifier.padding(start = 135.dp)) // Espacio entre botones y el botón "Regresar"
-
-//                                                        Button(
-//                                                            onClick = { /* Acción para el botón Regresar */ },
-//                                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC4D600))
-//                                                        ) {
-//                                                            Text("Listo", color = Color.Black)
-//                                                        }
-                                                    }
-                                                }
-
-                                            }
-                                        }
-                                    }
+                                AnimatedVisibility(
+                                    visible = isExpanded,
+                                    enter = expandVertically() + fadeIn(),
+                                    exit = shrinkVertically() + fadeOut()
+                                ) {
+                                    ExpandedContent(activity = activity, userId = userData.userId)
                                 }
                             }
                         }
@@ -395,18 +332,142 @@ fun InfoPopup(
     }
 }
 
-//fun toggleFavorite(isFavoriteFilled: MutableState<Boolean>) {
-//    isFavoriteFilled.value = !isFavoriteFilled.value
-//}
-//
-//fun toggleThumbUp(isThumbUpFilled: MutableState<Boolean>) {
-//    isThumbUpFilled.value = !isThumbUpFilled.value
-//}
-//
-//fun toggleThumbDown(isThumbDownFilled: MutableState<Boolean>) {
-//    isThumbDownFilled.value = !isThumbDownFilled.value
-//}
 
+@Composable
+fun OptionRow(
+    option: String,
+    imageRes: Int,
+    isExpanded: Boolean,
+    onToggle: () -> Unit,
+    activity: Activity
+) {
+    Button(
+        onClick = onToggle,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(71.dp),
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        contentPadding = PaddingValues(0.dp),
+        shape = RectangleShape
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
+                modifier = Modifier.height(30.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = option,
+                color = Color.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                painter = painterResource(
+                    id = if (isExpanded) R.drawable.ic_remove else R.drawable.ic_add
+                ),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = Color.Black
+            )
+        }
+    }
+}
+
+
+@Composable
+fun ExpandedContent(activity: Activity, userId:String) {
+    Column(modifier = Modifier
+        .padding(horizontal = 10.dp, vertical = 1.dp)
+        .background(color = Color.White)
+    ) {
+        AsyncImage(
+            model = activity.image,
+            contentDescription = "Activity Image",
+            modifier = Modifier.fillMaxWidth().height(200.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = activity.name,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Text(
+            text = activity.description,
+            color = Color.Black
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        InteractionButtons()
+    }
+}
+
+@Composable
+fun InteractionButtons() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val isFavorite = remember { mutableStateOf(false) }
+        val isThumbUp = remember { mutableStateOf(false) }
+        val isThumbDown = remember { mutableStateOf(false) }
+
+        IconToggleButton(
+            checked = isFavorite.value,
+            onCheckedChange = { isFavorite.value = it },
+            modifier = Modifier.size(30.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (isFavorite.value) R.drawable.favorite_filled else R.drawable.favorite
+                ),
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        IconToggleButton(
+            checked = isThumbUp.value,
+            onCheckedChange = {
+                isThumbUp.value = it
+                if (it) isThumbDown.value = false
+            },
+            modifier = Modifier.size(30.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (isThumbUp.value) R.drawable.thumb_up_filled else R.drawable.thumb_up
+                ),
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        IconToggleButton(
+            checked = isThumbDown.value,
+            onCheckedChange = {
+                isThumbDown.value = it
+                if (it) isThumbUp.value = false
+            },
+            modifier = Modifier.size(30.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (isThumbDown.value) R.drawable.thumb_down_filled else R.drawable.thumb_down
+                ),
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
+    }
+}
 
 // Función para verificar si un punto está dentro de un polígono
 fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
@@ -428,23 +489,23 @@ fun isPointInPolygon(point: Offset, vertices: List<Offset>): Boolean {
 
 fun plantaBaja(): List<PolygonArea> {
     return listOf(
-            PolygonArea(
-                points = listOf(
-                    Offset(393f, 330f),
-                    Offset(392f, 423f),
-                    Offset(379f, 423f),
-                    Offset(379f, 437f),
-                    Offset(392f, 438f),
-                    Offset(393f, 456f),
-                    Offset(703f, 456f),
-                    Offset(702f, 332f)
-                ),
-                initialColor = Color.Gray,
-                label = "Área de Alimentos Exterior",
-                onClick = {  },
-                initialOffset = Offset(-60f, 400f)
+        PolygonArea(
+            points = listOf(
+                Offset(393f, 330f),
+                Offset(392f, 423f),
+                Offset(379f, 423f),
+                Offset(379f, 437f),
+                Offset(392f, 438f),
+                Offset(393f, 456f),
+                Offset(703f, 456f),
+                Offset(702f, 332f)
             ),
-            PolygonArea(
+            initialColor = Color.Gray,
+            label = "Área de Alimentos Exterior",
+            onClick = {  },
+            initialOffset = Offset(-60f, 400f)
+        ),
+        PolygonArea(
             points = listOf(
                 Offset(404f, 388f),
                 Offset(404f, 399f),
@@ -592,7 +653,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(286f, 88f), Offset(288f, 125f), Offset(385f, 124f), Offset(384f, 88f)
+                Offset(288f, 88f),
+                Offset(288f, 125f),
+                Offset(385f, 125f),
+                Offset(385f, 88f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area3",
@@ -601,7 +665,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(396f, 89f), Offset(398f, 114f), Offset(456f, 115f), Offset(456f, 89f)
+                Offset(398f, 89f),
+                Offset(398f, 115f),
+                Offset(456f, 115f),
+                Offset(456f, 89f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area7",
@@ -610,7 +677,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(152f, 88f), Offset(152f, 112f), Offset(252f, 111f), Offset(252f, 88f)
+                Offset(152f, 88f),
+                Offset(152f, 112f),
+                Offset(252f, 112f),
+                Offset(252f, 88f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Acceso IMAX",
@@ -619,7 +689,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(80f, 358f), Offset(78f, 382f), Offset(99f, 383f), Offset(101f, 359f)
+                Offset(80f, 358f),
+                Offset(80f, 383f),
+                Offset(99f, 383f),
+                Offset(99f, 358f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area2",
@@ -628,7 +701,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(186f, 449f), Offset(186f, 472f), Offset(207f, 474f), Offset(207f, 452f)
+                Offset(186f, 449f),
+                Offset(186f, 472f),
+                Offset(207f, 472f),
+                Offset(207f, 449f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area2",
@@ -637,7 +713,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(111f, 362f), Offset(110f, 378f), Offset(127f, 379f), Offset(129f, 362f)
+                Offset(111f, 362f),
+                Offset(111f, 378f),
+                Offset(129f, 378f),
+                Offset(129f, 362f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area8",
@@ -646,7 +725,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(402f, 126f), Offset(402f, 141f), Offset(415f, 141f), Offset(415f, 127f)
+                Offset(402f, 126f),
+                Offset(402f, 141f),
+                Offset(415f, 141f),
+                Offset(415f, 126f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area4",
@@ -655,7 +737,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(191f, 139f), Offset(190f, 164f), Offset(209f, 163f), Offset(210f, 142f)
+                Offset(190f, 142f),
+                Offset(190f, 164f),
+                Offset(209f, 164f),
+                Offset(209f, 142f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area5",
@@ -664,7 +749,10 @@ fun sotano1(): List<PolygonArea> {
         ),
         PolygonArea(
             points = listOf(
-                Offset(195f, 190f), Offset(194f, 209f), Offset(216f, 209f), Offset(216f, 189f)
+                Offset(195f, 190f),
+                Offset(195f, 209f),
+                Offset(216f, 209f),
+                Offset(216f, 190f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
             label = "Area6",
@@ -680,7 +768,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(681f, 491f), Offset(658f, 482f), Offset(649f, 411f), Offset(531f, 382f),
                 Offset(523f, 373f), Offset(525f, 308f), Offset(486f, 305f)
             ),
-            initialColor = Color.DarkGray, //DarkGreen
+            initialColor = Color(0xFF8ECA48), //DarkGreen
             label = "DarkedZone",
             onClick = { /* Acción para DarkedZone */ },
             initialOffset = Offset(20f, 400f)
@@ -690,8 +778,8 @@ fun sotano1(): List<PolygonArea> {
                 Offset(330f, 543f), Offset(427f, 544f), Offset(426f, 557f), Offset(539f, 685f),
                 Offset(592f, 690f), Offset(593f, 775f), Offset(502f, 774f), Offset(484f, 766f)
             ),
-            initialColor = Color.DarkGray,
-            label = "DarkedZone",
+            initialColor = Color(0xFF286EBB),
+            label = "Zona Comunico",
             onClick = { /* Acción para DarkedZone */ },
             initialOffset = Offset(20f, 400f)
         )
@@ -911,42 +999,56 @@ fun sotano2(): List<PolygonArea> {
 }
 
 @Composable
-fun MapaInteractivo(areas: List<PolygonArea>) {
+fun MapaInteractivo(
+    areas: List<PolygonArea>,
+    selectedTopTabIndex: Int,
+    topTabs: List<Pair<String, Int>>,
+    showFrames: Boolean,
+    userData: UserData
+) {
     val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
     val areaColors = remember { areas.map { mutableStateOf(it.initialColor) } }
 
     var showPopup by remember { mutableStateOf(false) }
-    var selectedAreaLabel by remember { mutableStateOf("") }
+    var selectedZone by remember { mutableStateOf<String?>(null) } // Zona seleccionada
+
+    // Relación entre tabs y las áreas que tendrán marcos
+    val tabToAreasMap = mapOf(
+        "Expreso" to listOf("Relieve"),
+        "Soy" to listOf("Decidir"),
+        "Comprendo" to listOf("Baylab"),
+        "Pertenezco" to listOf("Energía"),
+        "Pequeños" to listOf("Barco", "Submarino"),
+        "Comunico" to listOf("Zona Comunico"),
+        "Empty" to listOf()
+    )
+
+    val selectedTabLabel = topTabs[selectedTopTabIndex].first
+    val areasConMarco = tabToAreasMap[selectedTabLabel] ?: emptyList()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFC4D600)) // Fondo Mapa interactivo verde 0xFFC4D600
-            .clipToBounds() // Recorta cualquier parte del mapa que sobresalga
+            .background(Color(0xFFC4D600))
+            .clipToBounds()
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
                     scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
                     val adjustedPan = pan * scale.floatValue
                     offset.value += adjustedPan + (centroid * (1 - zoom))
                 }
-
             }
     ) {
+        // Canvas para dibujar las áreas
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTapGestures { tapOffset ->
                         areas.forEachIndexed { index, area ->
-                            // Verifica si el área es decorativa y no debe reaccionar a clics
-                            if (area.label !in listOf(
-                                    "Background",
-                                    "DarkedZone",
-                                    "Área de Alimentos Exterior"
-                                )
-                            ) {
+                            if (area.label !in listOf("Background", "DarkedZone", "Área de Alimentos Exterior")) {
                                 val transformedPoints = area.points.map { point ->
                                     Offset(
                                         x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
@@ -960,13 +1062,22 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                                         areaColors[index].value = area.initialColor
                                     }
                                     showPopup = true
-                                    selectedAreaLabel = area.label
+                                    selectedZone = when (area.label) { // Zona seleccionada
+                                        "Relieve" -> "Expreso"
+                                        "Decidir" -> "Soy"
+                                        "Baylab" -> "Comprendo"
+                                        "Energía" -> "Pertenezco"
+                                        "Barco", "Submarino" -> "Pequeños"
+                                        "Zona Comunico" -> "Comunico"
+                                        else -> null
+                                    }
                                 }
                             }
                         }
                     }
                 }
         ) {
+            // Dibujar los polígonos primero
             areas.forEachIndexed { index, area ->
                 val path = Path().apply {
                     val transformedPoints = area.points.map { point ->
@@ -979,9 +1090,43 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                     transformedPoints.drop(1).forEach { lineTo(it.x, it.y) }
                     close()
                 }
-                drawPath(path = path, color = areaColors[index].value.copy(alpha = 0.9f))
+
+                // Dibuja el relleno del polígono
+                drawPath(
+                    path = path,
+                    color = areaColors[index].value.copy(alpha = 0.9f)
+                )
+            }
+
+            // Dibujar los marcos después, solo si `showFrames` está activado
+            if (showFrames) {
+                areas.forEachIndexed { _, area ->
+                    val path = Path().apply {
+                        val transformedPoints = area.points.map { point ->
+                            Offset(
+                                x = (point.x + area.initialOffset.x) * scale.floatValue + offset.value.x,
+                                y = (point.y + area.initialOffset.y) * scale.floatValue + offset.value.y
+                            )
+                        }
+                        moveTo(transformedPoints.first().x, transformedPoints.first().y)
+                        transformedPoints.drop(1).forEach { lineTo(it.x, it.y) }
+                        close()
+                    }
+
+                    if (area.label in areasConMarco) {
+                        drawPath(
+                            path = path,
+                            color = Color.White, // Color del marco
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                width = 3.dp.toPx() // Grosor del marco
+                            )
+                        )
+                    }
+                }
             }
         }
+
+        // Popup informativo
         InfoPopup(
             showPopup = showPopup,
             optionsWithImages = mapOf(
@@ -990,65 +1135,39 @@ fun MapaInteractivo(areas: List<PolygonArea>) {
                 "Comprendo" to R.drawable.comprendo,
                 "Pertenezco" to R.drawable.pertenezco,
                 "Pequeños" to R.drawable.pequenos,
-                "Comunico" to R.drawable.comunico,
-                "Innovo" to R.drawable.expreso, //Actividad de prueba
-                "Juego" to R.drawable.expreso, //Actividad de prueba
-                "Descubro" to R.drawable.expreso //Actividad de prueba
+                "Comunico" to R.drawable.comunico
             ),
+            userData = userData,
+            selectedZone = selectedZone, // Pasamos la zona seleccionada
             onDismiss = { showPopup = false }
         )
-
-        // Botones de Zoom In y Zoom Out en la parte inferior derecha
-//        Column(
-//            modifier = Modifier
-//                .align(Alignment.BottomEnd)
-//                .padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//            FloatingActionButton(
-//                onClick = {
-//                    scale.floatValue = (scale.floatValue * 1.2f).coerceIn(1f, 5f)
-//                },
-//                modifier = Modifier.size(50.dp),
-//                containerColor = Color.White
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_zoom_in), // Asegúrate de que este recurso exista
-//                    contentDescription = "Zoom In",
-//                    tint = Color.Black
-//                )
-//            }
-//
-//            FloatingActionButton(
-//                onClick = {
-//                    scale.floatValue = (scale.floatValue / 1.2f).coerceIn(1f, 5f)
-//                },
-//                modifier = Modifier.size(50.dp),
-//                containerColor = Color.White
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_zoom_out), // Asegúrate de que este recurso exista
-//                    contentDescription = "Zoom Out",
-//                    tint = Color.Black
-//                )
-//            }
-//        }
-
     }
 }
 
+
+
 @Composable
-fun PisoContent(piso: Int) {
+fun PisoContent(
+    piso: Int,
+    selectedTopTabIndex: Int,
+    topTabs: List<Pair<String, Int>>,
+    showFrames: Boolean,
+    userData: UserData // Nuevo parámetro
+) {
     val areas = when (piso) {
-        0 -> plantaBaja() // Contenido del Piso 1
-        1 -> sotano1() // Contenido del Piso 2
-        2 -> sotano2() // Contenido del Piso 3
+        0 -> plantaBaja()
+        1 -> sotano1()
+        2 -> sotano2()
         else -> emptyList()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Llama a la función que contiene la lógica de mapa y polígonos con las áreas del piso actual
-        MapaInteractivo(areas = areas)
+        MapaInteractivo(
+            areas = areas,
+            selectedTopTabIndex = selectedTopTabIndex,
+            topTabs = topTabs,
+            showFrames = showFrames,
+            userData = userData // Pasamos el userData
+        )
     }
 }
-
