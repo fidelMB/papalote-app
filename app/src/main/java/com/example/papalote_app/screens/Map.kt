@@ -556,7 +556,7 @@ fun plantaBaja(): List<PolygonArea> {
                 Offset(702f, 332f)
             ),
             initialColor = Color.Gray,
-            label = "Área de Alimentos Exterior",
+            label = "DarkedZone", //Área de Alimentos Exterior
             onClick = {  },
             initialOffset = Offset(-60f, 400f)
         ),
@@ -580,7 +580,7 @@ fun plantaBaja(): List<PolygonArea> {
                 Offset(467f, 385f)
             ),
             initialColor = Color.DarkGray,
-            label = "Área de Alimentos Interior",
+            label = "DarkedZone", //Área de Alimentos Interior
             onClick = {  },
             initialOffset = Offset(-60f, 400f)
         ),
@@ -594,7 +594,7 @@ fun plantaBaja(): List<PolygonArea> {
                 Offset(573f, 55f)
             ),
             initialColor = Color.Gray,
-            label = "Área 2",
+            label = "DarkedZone", //Área 2
             onClick = {  },
             initialOffset = Offset(-60f, 400f)
         )
@@ -642,7 +642,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(296f, 310f)
             ),
             initialColor = Color.Cyan,
-            label = "Monstruo de Aramberri",
+            label = "DarkedZone", //Monstruo de Aramberri
             onClick = { /* Acción para Energía */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -662,7 +662,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(243f, 439f), Offset(244f, 375f), Offset(223f, 361f)
             ),
             initialColor = Color(0xFFCCE9C6),
-            label = "Tienda",
+            label = "DarkedZone", //Tienda
             onClick = { /* Acción para Tienda */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -672,7 +672,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(523f, 130f)
             ),
             initialColor = Color(0xFFCCE9C6),
-            label = "Sala de Exposiciones Temporales",
+            label = "DarkedZone", //Sala de Exposiciones Temporales
             onClick = { /* Acción para Sala de Exposiciones Temporales */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -702,7 +702,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(232f, 333f), Offset(212f, 367f), Offset(237f, 362f)
             ),
             initialColor = Color(0xffff8d2f),//light orange
-            label = "Acceso al Museo",
+            label = "DarkedZone", //Acceso al Museo
             onClick = { /* Acción para Acceso al Museo */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -714,7 +714,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(385f, 88f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area3",
+            label = "DarkedZone", //Area3
             onClick = { /* Acción para Area3 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -726,7 +726,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(456f, 89f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area7",
+            label = "DarkedZone", //Area7
             onClick = { /* Acción para Area7 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -738,7 +738,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(252f, 88f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Acceso IMAX",
+            label = "DarkedZone", //Acceso IMAX
             onClick = { /* Acción para Acceso IMAX */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -750,7 +750,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(99f, 358f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area2",
+            label = "DarkedZone", //Area2
             onClick = { /* Acción para Area2 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -762,7 +762,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(207f, 449f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area2",
+            label = "DarkedZone", //Area2
             onClick = { /* Acción para Area2 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -774,7 +774,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(129f, 362f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area8",
+            label = "DarkedZone", //Area8
             onClick = { /* Acción para Area8 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -786,7 +786,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(415f, 126f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area4",
+            label = "DarkedZone", //Area4
             onClick = { /* Acción para Area4 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -798,7 +798,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(209f, 142f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area5",
+            label = "DarkedZone", //Area5
             onClick = { /* Acción para Area5 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -810,7 +810,7 @@ fun sotano1(): List<PolygonArea> {
                 Offset(216f, 190f)
             ),
             initialColor = Color(0xFFED484B),// LightRed
-            label = "Area6",
+            label = "DarkedZone", //Area6
             onClick = { /* Acción para Area6 */ },
             initialOffset = Offset(20f, 400f)
         ),
@@ -905,7 +905,7 @@ fun sotano2(): List<PolygonArea> {
                 Offset(479f, 309f)
             ),
             initialColor = Color.Cyan,
-            label = "Monstruo de Aramberri",
+            label = "DarkedZone", //Monstruo de Aramberri
             onClick = { /* Acción para Monstruo de Aramberri */ },
 //            initialOffset = Offset(90f, 1130f)
             initialOffset = Offset(-60f, 400f)
@@ -998,7 +998,7 @@ fun sotano2(): List<PolygonArea> {
                 Offset(191f, 70f)
             ),
             initialColor = Color(0xFFCCE9C6),
-            label = "MegapantallaIMAX",
+            label = "DarkedZone",//MegapantallaIMAX
             onClick = { /* Acción para MegapantallaIMAX */ },
 //            initialOffset = Offset(90f, 1130f)
             initialOffset = Offset(-60f, 400f)
@@ -1045,7 +1045,7 @@ fun sotano2(): List<PolygonArea> {
                 Offset(655f, 560f)
             ),
             initialColor = Color(0xFFFFDA9B),
-            label = "Dinosaurios",
+            label = "DarkedZone", //Dinosaurios
             onClick = { /* Acción visual sin clic */ },
 //            initialOffset = Offset(90f, 1130f)
             initialOffset = Offset(-60f, 400f)
