@@ -32,7 +32,8 @@ fun MainNavigation(
 
         composable(Screen.Map.route) {
             Map(
-                userData = userData
+                userData = userData,
+                firestore = firestore
             )
         }
 

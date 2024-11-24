@@ -1,5 +1,6 @@
 package com.example.papalote_app.screens
 
+import android.util.Log
 import com.example.papalote_app.R
 import androidx.compose.runtime.Composable
 import androidx.compose.animation.AnimatedVisibility
@@ -19,6 +20,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -46,6 +50,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 import com.example.papalote_app.model.UserData
+import com.google.firebase.firestore.FirebaseFirestore
 
 // Datos de cada área poligonal
 data class PolygonArea(
@@ -57,7 +62,7 @@ data class PolygonArea(
 )
 
 @Composable
-fun Map(userData: UserData) {
+fun Map(userData: UserData, firestore: FirebaseFirestore) {
 
     // Estados para las pestañas
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -103,9 +108,9 @@ fun Map(userData: UserData) {
             // Contenido principal del mapa basado en el piso
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTabIndex) {
-                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
-                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
-                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData)
+                    0 -> PisoContent(piso = 0, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData, firestore = firestore)
+                    1 -> PisoContent(piso = 1, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData, firestore = firestore)
+                    2 -> PisoContent(piso = 2, selectedTopTabIndex = selectedTopTabIndex, topTabs = topTabs, showFrames = showFrames, userData = userData, firestore = firestore)
                 }
             }
 
@@ -248,6 +253,7 @@ fun InfoPopup(
     userData: UserData,
     selectedZone: String?, // Nueva variable para la zona seleccionada
     onDismiss: () -> Unit,
+    firestore: FirebaseFirestore
 ) {
     if (showPopup) {
         Dialog(
@@ -321,7 +327,7 @@ fun InfoPopup(
                                     enter = expandVertically() + fadeIn(),
                                     exit = shrinkVertically() + fadeOut()
                                 ) {
-                                    ExpandedContent(activity = activity, userId = userData.userId)
+                                    ExpandedContent(activity = activity, userData = userData, firestore = firestore)
                                 }
                             }
                         }
@@ -384,7 +390,7 @@ fun OptionRow(
 
 
 @Composable
-fun ExpandedContent(activity: Activity, userId:String) {
+fun ExpandedContent(activity: Activity, userData: UserData, firestore: FirebaseFirestore) {
     Column(modifier = Modifier
         .padding(horizontal = 10.dp, vertical = 1.dp)
         .background(color = Color.White)
@@ -405,65 +411,114 @@ fun ExpandedContent(activity: Activity, userId:String) {
             color = Color.Black
         )
         Spacer(modifier = Modifier.height(8.dp))
-        InteractionButtons()
+        InteractionButtons(activity = activity, userData = userData, firestore = firestore)
     }
 }
 
 @Composable
-fun InteractionButtons() {
+fun InteractionButtons(activity: Activity, userData: UserData,firestore: FirebaseFirestore) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        val isFavorite = remember { mutableStateOf(false) }
-        val isThumbUp = remember { mutableStateOf(false) }
-        val isThumbDown = remember { mutableStateOf(false) }
+        val isFavorite = remember { mutableStateOf(activity.isFavorite) }
+        val isLiked = remember { mutableStateOf(activity.isLiked) }
+        val isDisliked = remember { mutableStateOf(activity.isDisliked) }
 
-        IconToggleButton(
-            checked = isFavorite.value,
-            onCheckedChange = { isFavorite.value = it },
-            modifier = Modifier.size(30.dp)
-        ) {
+        IconButton (
+            onClick = {
+                isFavorite.value = !isFavorite.value
+
+                // conseguir el indice de la actividad en los datos locales del usuario
+                for ((currentIndex, userActivities) in userData.activities.withIndex()) {
+                    if (userActivities.name == activity.name) {
+                        userData.activities[currentIndex].isFavorite = isFavorite.value
+                        break
+                    }
+                }
+
+                firestore
+                    .collection("users")
+                    .document(userData.userId)
+                    .update("activities", userData.activities)
+                    .addOnSuccessListener { Log.d("Activity favorite Firestore", "Succesfully updated document with activity favorite") }
+                    .addOnFailureListener { e -> Log.w("Activity favorite Firestore", "Error updating document", e) }
+
+            }
+        )
+        {
             Icon(
                 painter = painterResource(
-                    id = if (isFavorite.value) R.drawable.favorite_filled else R.drawable.favorite
+                   id = if (isFavorite.value) R.drawable.favorite_filled else R.drawable.favorite
                 ),
-                contentDescription = null,
-                tint = Color.Black
+                contentDescription = "FavoriteIcon",
+                tint = Color.Black,
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        IconToggleButton(
-            checked = isThumbUp.value,
-            onCheckedChange = {
-                isThumbUp.value = it
-                if (it) isThumbDown.value = false
-            },
-            modifier = Modifier.size(30.dp)
-        ) {
+        IconButton (
+            onClick = {
+                isLiked.value = !isLiked.value
+                isDisliked.value = false
+
+                // conseguir el indice de la actividad en los datos locales del usuario
+                for ((currentIndex, userActivities) in userData.activities.withIndex()) {
+                    if (userActivities.name == activity.name) {
+                        userData.activities[currentIndex].isLiked = isLiked.value
+                        userData.activities[currentIndex].isDisliked = false
+                        break
+                    }
+                }
+
+                firestore
+                    .collection("users")
+                    .document(userData.userId)
+                    .update("activities", userData.activities)
+                    .addOnSuccessListener { Log.d("Activity liked Firestore", "Succesfully updated document with liked activity") }
+                    .addOnFailureListener { e -> Log.w("Activity liked Firestore", "Error updating document", e) }
+
+            }
+        )
+        {
             Icon(
                 painter = painterResource(
-                    id = if (isThumbUp.value) R.drawable.thumb_up_filled else R.drawable.thumb_up
+                    id = if (isLiked.value) R.drawable.thumb_up_filled else R.drawable.thumb_up
                 ),
-                contentDescription = null,
-                tint = Color.Black
+                contentDescription = "LikeIcon",
+                tint = Color.Black,
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        IconToggleButton(
-            checked = isThumbDown.value,
-            onCheckedChange = {
-                isThumbDown.value = it
-                if (it) isThumbUp.value = false
-            },
-            modifier = Modifier.size(30.dp)
-        ) {
+        IconButton (
+            onClick = {
+                isDisliked.value = !isDisliked.value
+                isLiked.value = false
+
+                // conseguir el indice de la actividad en los datos locales del usuario
+                for ((currentIndex, userActivities) in userData.activities.withIndex()) {
+                    if (userActivities.name == activity.name) {
+                        userData.activities[currentIndex].isDisliked = isDisliked.value
+                        userData.activities[currentIndex].isLiked = false
+                        break
+                    }
+                }
+
+                firestore
+                    .collection("users")
+                    .document(userData.userId)
+                    .update("activities", userData.activities)
+                    .addOnSuccessListener { Log.d("Activity disliked Firestore", "Succesfully updated document with disliked activity") }
+                    .addOnFailureListener { e -> Log.w("Activity disliked Firestore", "Error updating document", e) }
+
+            }
+        )
+        {
             Icon(
                 painter = painterResource(
-                    id = if (isThumbDown.value) R.drawable.thumb_down_filled else R.drawable.thumb_down
+                    id = if (isDisliked.value) R.drawable.thumb_down_filled else R.drawable.thumb_down
                 ),
-                contentDescription = null,
-                tint = Color.Black
+                contentDescription = "DislikedIcon",
+                tint = Color.Black,
             )
         }
     }
@@ -1004,7 +1059,8 @@ fun MapaInteractivo(
     selectedTopTabIndex: Int,
     topTabs: List<Pair<String, Int>>,
     showFrames: Boolean,
-    userData: UserData
+    userData: UserData,
+    firestore: FirebaseFirestore
 ) {
     val scale = remember { mutableFloatStateOf(1.5f) }
     val offset = remember { mutableStateOf(Offset.Zero) }
@@ -1139,7 +1195,8 @@ fun MapaInteractivo(
             ),
             userData = userData,
             selectedZone = selectedZone, // Pasamos la zona seleccionada
-            onDismiss = { showPopup = false }
+            onDismiss = { showPopup = false },
+            firestore = firestore
         )
     }
 }
@@ -1152,7 +1209,8 @@ fun PisoContent(
     selectedTopTabIndex: Int,
     topTabs: List<Pair<String, Int>>,
     showFrames: Boolean,
-    userData: UserData // Nuevo parámetro
+    userData: UserData, // Nuevo parámetro
+    firestore: FirebaseFirestore
 ) {
     val areas = when (piso) {
         0 -> plantaBaja()
@@ -1167,7 +1225,8 @@ fun PisoContent(
             selectedTopTabIndex = selectedTopTabIndex,
             topTabs = topTabs,
             showFrames = showFrames,
-            userData = userData // Pasamos el userData
+            userData = userData, // Pasamos el userData
+            firestore = firestore
         )
     }
 }
