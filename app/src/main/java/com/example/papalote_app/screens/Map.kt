@@ -422,8 +422,8 @@ fun InteractionButtons(activity: Activity, userData: UserData,firestore: Firebas
         modifier = Modifier.fillMaxWidth()
     ) {
         val isFavorite = remember { mutableStateOf(activity.isFavorite) }
-        val isThumbUp = remember { mutableStateOf(false) }
-        val isThumbDown = remember { mutableStateOf(false) }
+        val isLiked = remember { mutableStateOf(activity.isLiked) }
+        val isDisliked = remember { mutableStateOf(activity.isDisliked) }
 
         IconButton (
             onClick = {
@@ -455,52 +455,70 @@ fun InteractionButtons(activity: Activity, userData: UserData,firestore: Firebas
                 tint = Color.Black,
             )
         }
-
-//        IconToggleButton(
-//            checked = isFavorite.value,
-//            onCheckedChange = { isFavorite.value = it },
-//            modifier = Modifier.size(30.dp)
-//        ) {
-//            Icon(
-//                painter = painterResource(
-//                    id = if (isFavorite.value) R.drawable.favorite_filled else R.drawable.favorite
-//                ),
-//                contentDescription = null,
-//                tint = Color.Black
-//            )
-//        }
         Spacer(modifier = Modifier.width(8.dp))
-        IconToggleButton(
-            checked = isThumbUp.value,
-            onCheckedChange = {
-                isThumbUp.value = it
-                if (it) isThumbDown.value = false
-            },
-            modifier = Modifier.size(30.dp)
-        ) {
+        IconButton (
+            onClick = {
+                isLiked.value = !isLiked.value
+                isDisliked.value = false
+
+                // conseguir el indice de la actividad en los datos locales del usuario
+                for ((currentIndex, userActivities) in userData.activities.withIndex()) {
+                    if (userActivities.name == activity.name) {
+                        userData.activities[currentIndex].isLiked = isLiked.value
+                        userData.activities[currentIndex].isDisliked = false
+                        break
+                    }
+                }
+
+                firestore
+                    .collection("users")
+                    .document(userData.userId)
+                    .update("activities", userData.activities)
+                    .addOnSuccessListener { Log.d("Activity liked Firestore", "Succesfully updated document with liked activity") }
+                    .addOnFailureListener { e -> Log.w("Activity liked Firestore", "Error updating document", e) }
+
+            }
+        )
+        {
             Icon(
                 painter = painterResource(
-                    id = if (isThumbUp.value) R.drawable.thumb_up_filled else R.drawable.thumb_up
+                    id = if (isLiked.value) R.drawable.thumb_up_filled else R.drawable.thumb_up
                 ),
-                contentDescription = null,
-                tint = Color.Black
+                contentDescription = "LikeIcon",
+                tint = Color.Black,
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        IconToggleButton(
-            checked = isThumbDown.value,
-            onCheckedChange = {
-                isThumbDown.value = it
-                if (it) isThumbUp.value = false
-            },
-            modifier = Modifier.size(30.dp)
-        ) {
+        IconButton (
+            onClick = {
+                isDisliked.value = !isDisliked.value
+                isLiked.value = false
+
+                // conseguir el indice de la actividad en los datos locales del usuario
+                for ((currentIndex, userActivities) in userData.activities.withIndex()) {
+                    if (userActivities.name == activity.name) {
+                        userData.activities[currentIndex].isDisliked = isDisliked.value
+                        userData.activities[currentIndex].isLiked = false
+                        break
+                    }
+                }
+
+                firestore
+                    .collection("users")
+                    .document(userData.userId)
+                    .update("activities", userData.activities)
+                    .addOnSuccessListener { Log.d("Activity disliked Firestore", "Succesfully updated document with disliked activity") }
+                    .addOnFailureListener { e -> Log.w("Activity disliked Firestore", "Error updating document", e) }
+
+            }
+        )
+        {
             Icon(
                 painter = painterResource(
-                    id = if (isThumbDown.value) R.drawable.thumb_down_filled else R.drawable.thumb_down
+                    id = if (isDisliked.value) R.drawable.thumb_down_filled else R.drawable.thumb_down
                 ),
-                contentDescription = null,
-                tint = Color.Black
+                contentDescription = "DislikedIcon",
+                tint = Color.Black,
             )
         }
     }
