@@ -1,6 +1,6 @@
 package com.example.papalote_app.components
 
-import android.app.PendingIntent.getActivity
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,16 +29,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.papalote_app.model.Activity
-
+import com.example.papalote_app.model.UserData
 import com.example.papalote_app.model.getActivities
-
+import com.google.android.play.integrity.internal.u
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun FavoriteCard(activity: Activity = getActivities()[1], onClick:(Activity)->Unit) {
+fun FavoriteCard(activity: Activity = getActivities()[1], firestore: FirebaseFirestore, userData: UserData, onClick:(Activity)->Unit) {
     Card(
         shape = RoundedCornerShape(corner = CornerSize(12.dp)),
         modifier = Modifier
@@ -89,15 +90,28 @@ fun FavoriteCard(activity: Activity = getActivities()[1], onClick:(Activity)->Un
                 )
             }
 
-            Icon(
-                imageVector = Icons.Default.Notifications,
-                contentDescription = "Notification",
-                tint = Color.Black,
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.CenterVertically)
-                    .padding(end = 20.dp)
-            )
+            IconButton(
+                onClick = {
+                    val activityIndex = userData.activities.indexOf(activity)
+                    userData.activities[activityIndex].isFavorite = false
+
+                    firestore
+                        .collection("users")
+                        .document(userData.userId)
+                        .update("activities", userData.activities)
+                        .addOnSuccessListener { Log.d("Activity Favorite Firestore", "Succesfully updated document with activity favorite") }
+                        .addOnFailureListener { e -> Log.w("Activity Favorite Firestore", "Error updating document", e) }                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Notification",
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 20.dp)
+                )
+            }
         }
     }
 }

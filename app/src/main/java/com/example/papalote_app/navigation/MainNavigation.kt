@@ -46,7 +46,8 @@ fun MainNavigation(
 
         composable(Screen.Favorites.route) {
             Favorites(
-                userData = userData
+                userData = userData,
+                firestore = firestore
             )
         }
 

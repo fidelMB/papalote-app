@@ -20,13 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.papalote_app.components.ActivityPopUp
 import com.example.papalote_app.model.Activity
-import com.example.papalote_app.model.getActivities
 import com.example.papalote_app.components.FavoriteCard
 import com.example.papalote_app.model.UserData
-
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun Favorites(userData: UserData) {
+fun Favorites(userData: UserData, firestore: FirebaseFirestore) {
     var popUp by remember { mutableStateOf<Activity?>(null) }
     Box(
         modifier = Modifier
@@ -45,7 +44,7 @@ fun Favorites(userData: UserData) {
             )
             LazyColumn {
                 items(items = userData.activities) { activity ->
-                    FavoriteCard(activity = activity) { popUp = it } 
+                    FavoriteCard(activity = activity, firestore = firestore, userData = userData) { popUp = it }
 
                 }
             }
