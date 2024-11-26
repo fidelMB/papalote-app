@@ -42,14 +42,14 @@ class AuthViewModel : ViewModel() {
     }
 
     private fun checkAuthState() {
-        auth.currentUser?.let {
-            if (_authState.value !is AuthUiState.NotAuthenticated) {
-                _authState.value = AuthUiState.Success
-            }
-        } ?: run {
+        val currentUser = auth.currentUser
+        if (currentUser != null && currentUser.isEmailVerified) { // Verifica si el email está validado
+            _authState.value = AuthUiState.Success
+        } else {
             _authState.value = AuthUiState.NotAuthenticated
         }
     }
+
 
     fun updateEmail(email: String) {
         val validationResult = Validators.validateEmail(email)
