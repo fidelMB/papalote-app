@@ -16,9 +16,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.papalote_app.components.FavoriteCard
 import com.example.papalote_app.model.UserData
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun Favorites(userData: UserData) {
+fun Favorites(userData: UserData, firestore: FirebaseFirestore) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -34,9 +35,10 @@ fun Favorites(userData: UserData) {
                 ),
                 modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
             )
+
             LazyColumn {
                 items(items = userData.activities) { activity ->
-                    FavoriteCard(activity)
+                    FavoriteCard(activity = activity, firestore = firestore, userData = userData)
                 }
             }
         }
