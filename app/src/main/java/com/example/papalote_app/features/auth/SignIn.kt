@@ -1,4 +1,4 @@
-// feature/auth/SignIn.kt
+// SignIn.kt
 package com.example.papalote_app.features.auth
 
 import androidx.compose.foundation.Image
@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.papalote_app.R
 import com.example.papalote_app.components.AuthButton
@@ -25,7 +24,8 @@ fun SignIn(
     onLogin: () -> Unit,
     onForgotPassword: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    errorMessage: String? = null
 ) {
     Column(
         modifier = Modifier
@@ -37,8 +37,8 @@ fun SignIn(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo",
             modifier = Modifier
-                .size(300.dp) // Reduced size for a more compact layout
-                .padding(bottom = 8.dp) // Adjusted padding
+                .size(200.dp)
+                .padding(8.dp, 16.dp, 15.dp, 32.dp)
         )
 
         Text(
@@ -49,6 +49,15 @@ fun SignIn(
             ),
             modifier = Modifier.padding(bottom = 16.dp)
         )
+
+        if (!errorMessage.isNullOrEmpty()) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
 
         AuthTextField(
             value = formState.email.value,
@@ -83,7 +92,6 @@ fun SignIn(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
-
         ) {
             Text("¿No tienes cuenta? ")
             TextButton(onClick = onNavigateToRegister) {
