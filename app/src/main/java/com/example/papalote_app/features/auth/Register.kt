@@ -1,23 +1,18 @@
-// feature/auth/Register.kt
+// Register.kt
 package com.example.papalote_app.features.auth
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.papalote_app.R
-import com.example.papalote_app.components.AuthButton
-import com.example.papalote_app.components.AuthTextField
-import com.example.papalote_app.components.DatePickerField
-import com.example.papalote_app.components.GenderSelector
+import com.example.papalote_app.components.*
 
 @Composable
 fun Register(
@@ -28,10 +23,19 @@ fun Register(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
+    onAcceptedTermsChange: (Boolean) -> Unit,
     onRegister: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    errorMessage: String? = null
 ) {
+    var showPrivacyPolicy by remember { mutableStateOf(false) }
+
+    if (showPrivacyPolicy) {
+        PrivacyPolicyDialog(onDismiss = { showPrivacyPolicy = false })
+    }
+
+    BackHandler(onBack = onNavigateToLogin)
 
     Column(
         modifier = Modifier
@@ -40,14 +44,6 @@ fun Register(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Logo",
-            modifier = Modifier
-                .size(120.dp)
-                .padding(bottom = 24.dp)
-        )
-
         Text(
             text = "Regístrate",
             style = MaterialTheme.typography.headlineMedium.copy(
@@ -56,6 +52,15 @@ fun Register(
             ),
             modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
         )
+
+        if (!errorMessage.isNullOrEmpty()) {
+            Text(
+                text = errorMessage,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
 
         AuthTextField(
             value = formState.fullName.value,
@@ -103,6 +108,33 @@ fun Register(
             isPassword = true,
             modifier = Modifier.padding(bottom = 16.dp)
         )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        ) {
+            Checkbox(
+                checked = formState.acceptedTerms,
+                onCheckedChange = onAcceptedTermsChange,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = Color(0xFFC4D600),
+                    uncheckedColor = Color(0xFFC4D600),
+                    checkmarkColor = Color.White
+                )
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Acepto los ",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "términos y condiciones",
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF838f01)),
+                modifier = Modifier.clickable { showPrivacyPolicy = true }
+            )
+        }
 
         AuthButton(
             text = "Registrarse",

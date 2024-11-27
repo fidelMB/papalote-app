@@ -46,18 +46,32 @@ object Validators {
         return try {
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             sdf.isLenient = false
-            sdf.parse(date)
-
             val inputDate = sdf.parse(date)
             val currentDate = Date()
 
             when {
                 inputDate == null -> ValidationResult.Invalid("Fecha inválida")
                 inputDate.after(currentDate) -> ValidationResult.Invalid("La fecha no puede ser futura")
-                else -> ValidationResult.Valid
+                else -> {
+                    val ageInMillis = currentDate.time - inputDate.time
+                    val ageInYears = ageInMillis / (365.25 * 24 * 60 * 60 * 1000)
+
+                    if (ageInYears < 13) {
+                        ValidationResult.Invalid("La edad mínima es de 13 años")
+                    } else {
+                        ValidationResult.Valid
+                    }
+                }
             }
         } catch (e: Exception) {
             ValidationResult.Invalid("Formato de fecha inválido")
+        }
+    }
+
+    fun validateGender(gender: String): ValidationResult {
+        return when {
+            gender.isBlank() -> ValidationResult.Invalid("El género es requerido")
+            else -> ValidationResult.Valid
         }
     }
 }

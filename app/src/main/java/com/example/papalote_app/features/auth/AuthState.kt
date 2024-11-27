@@ -1,10 +1,10 @@
-// feature/auth/AuthState.kt
+// AuthState.kt
 package com.example.papalote_app.features.auth
 
 data class AuthFieldState(
     val value: String = "",
     val error: String? = null,
-    val isValid: Boolean = true
+    val isValid: Boolean = false
 )
 
 data class AuthFormState(
@@ -13,12 +13,14 @@ data class AuthFormState(
     val confirmPassword: AuthFieldState = AuthFieldState(),
     val fullName: AuthFieldState = AuthFieldState(),
     val birthDate: AuthFieldState = AuthFieldState(),
-    val gender: String = ""
+    val gender: String = "",
+    val acceptedTerms: Boolean = false
 ) {
     val isValid: Boolean
         get() = email.isValid && password.isValid &&
                 confirmPassword.isValid && fullName.isValid &&
-                birthDate.isValid && gender.isNotBlank()
+                birthDate.isValid && gender.isNotBlank() &&
+                acceptedTerms
 }
 
 sealed class AuthError {

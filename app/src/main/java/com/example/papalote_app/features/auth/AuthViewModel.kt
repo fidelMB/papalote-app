@@ -1,4 +1,4 @@
-// feature/auth/AuthViewModel.kt
+// AuthViewModel.kt
 package com.example.papalote_app.features.auth
 
 import androidx.lifecycle.ViewModel
@@ -10,11 +10,7 @@ import com.example.papalote_app.utils.Constants
 import com.example.papalote_app.utils.ValidationResult
 import com.example.papalote_app.utils.Validators
 import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthEmailException
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -37,17 +33,53 @@ class AuthViewModel : ViewModel() {
     private val _userData = MutableStateFlow<UserData?>(UserData())
     val userData: StateFlow<UserData?> = _userData
 
+    private val _isLogin = MutableStateFlow(true)
+    val isLogin: StateFlow<Boolean> = _isLogin
+
+    fun setIsLogin(value: Boolean) {
+        _isLogin.value = value
+        resetFormState()
+    }
+
+    private fun resetFormState() {
+        _formState.value = AuthFormState()
+    }
+
     init {
         checkAuthState()
     }
 
     private fun checkAuthState() {
-        auth.currentUser?.let {
-            if (_authState.value !is AuthUiState.NotAuthenticated) {
-                _authState.value = AuthUiState.Success
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            _authState.value = AuthUiState.Success
+
+            viewModelScope.launch {
+                loadUserData(currentUser.uid)
             }
-        } ?: run {
+        } else {
             _authState.value = AuthUiState.NotAuthenticated
+        }
+    }
+
+    private suspend fun loadUserData(userId: String) {
+        try {
+            val userDocument = firestore.collection(Constants.USERS_COLLECTION)
+                .document(userId)
+                .get()
+                .await()
+
+            val userData = userDocument.toObject(UserData::class.java)
+            if (userData != null) {
+                userData.userId = userId
+                _userData.value = userData
+            } else {
+                _authState.value = AuthUiState.NotAuthenticated
+                auth.signOut()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _authState.value = AuthUiState.Error(AuthError.Unknown(e.message ?: "Error desconocido"))
         }
     }
 
@@ -103,6 +135,10 @@ class AuthViewModel : ViewModel() {
         _formState.update { it.copy(gender = gender) }
     }
 
+    fun updateAcceptedTerms(accepted: Boolean) {
+        _formState.update { it.copy(acceptedTerms = accepted) }
+    }
+
     private fun updateField(
         value: String,
         validation: ValidationResult,
@@ -120,10 +156,12 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _authState.value = AuthUiState.Loading
-                auth.signInWithEmailAndPassword(email, password).await()
+                val result = auth.signInWithEmailAndPassword(email, password).await()
                 _authState.value = AuthUiState.Success
 
-                getUserData(email)
+                result.user?.uid?.let { uid ->
+                    loadUserData(uid)
+                }
             } catch (e: Exception) {
                 _authState.value = AuthUiState.Error(mapFirebaseError(e))
             }
@@ -135,16 +173,13 @@ class AuthViewModel : ViewModel() {
             try {
                 _authState.value = AuthUiState.Loading
 
-                // 1. Crear usuario en Firebase Auth
                 val result = auth.createUserWithEmailAndPassword(email, password).await()
 
-                // 2. Obtener los eventos para asignarlos al usuario
                 val events = firestore.collection("events")
                     .get()
                     .await()
                     .documents.map { document -> document.toObject(Event::class.java)!! }
 
-                // 3. Guardar información adicional en Firestore
                 result.user?.uid?.let { uid ->
                     firestore.collection(Constants.USERS_COLLECTION)
                         .document(uid)
@@ -160,15 +195,7 @@ class AuthViewModel : ViewModel() {
                             )
                         ).await()
 
-                    _userData.value = UserData(
-                        userId = uid,
-                        fullName = _formState.value.fullName.value,
-                        birthDate = _formState.value.birthDate.value,
-                        gender = _formState.value.gender,
-                        email = email,
-                        activities = mutableListOf<Activity>(),
-                        events = events
-                    )
+                    loadUserData(uid)
                 }
 
                 _authState.value = AuthUiState.Success
@@ -199,9 +226,9 @@ class AuthViewModel : ViewModel() {
     private fun mapFirebaseError(exception: Exception): AuthError {
         return when (exception) {
             is FirebaseAuthInvalidCredentialsException -> AuthError.InvalidCredentials
-            is FirebaseAuthInvalidUserException -> AuthError.UserNotFound
+            is FirebaseAuthInvalidUserException -> AuthError.InvalidCredentials
             is FirebaseAuthWeakPasswordException -> AuthError.WeakPassword
-            is FirebaseAuthEmailException -> AuthError.EmailAlreadyInUse
+            is FirebaseAuthUserCollisionException -> AuthError.EmailAlreadyInUse
             is FirebaseNetworkException -> AuthError.NetworkError
             else -> when {
                 exception.message?.contains("too-many-requests") == true ->
@@ -214,19 +241,14 @@ class AuthViewModel : ViewModel() {
     private suspend fun getUserData(userEmail: String) {
         try {
             val userId = FirebaseAuth.getInstance().currentUser?.uid
-            // Query for the document where the "email" field matches userEmail
             if (userId != null) {
                 val querySnapshot = firestore.collection("users")
-                    .document(userId)  // Access the current user's document directly
+                    .document(userId)
                     .get()
                     .await()
 
                 _userData.value = querySnapshot.toObject(UserData::class.java)
                 _userData.value?.userId = userId
-
-            } else {
-                // Handle the case where no document with the specified email was found
-                println("No user found with email $userEmail")
             }
         } catch (e: Exception) {
             e.printStackTrace()
