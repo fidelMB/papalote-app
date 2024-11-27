@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun Favorites(userData: UserData, firestore: FirebaseFirestore) {
     var popUp by remember { mutableStateOf<Activity?>(null) }
+    val userActivitiesList = remember { mutableStateListOf<Activity>().apply { addAll(userData.activities) } }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -43,8 +46,10 @@ fun Favorites(userData: UserData, firestore: FirebaseFirestore) {
                 modifier = Modifier.padding(32.dp, 16.dp, 32.dp, 16.dp)
             )
             LazyColumn {
-                items(items = userData.activities) { activity ->
-                    FavoriteCard(activity = activity, firestore = firestore, userData = userData) { popUp = it }
+                items(items = userActivitiesList) { activity ->
+                    if (activity.isFavorite == true) {
+                        FavoriteCard(activity = activity, firestore = firestore, userData = userData, userActivitiesList = userActivitiesList) { popUp = it }
+                    }
 
                 }
             }

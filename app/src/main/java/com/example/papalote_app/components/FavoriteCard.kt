@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -24,21 +21,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.example.papalote_app.R
 import com.example.papalote_app.model.Activity
 import com.example.papalote_app.model.UserData
 import com.example.papalote_app.model.getActivities
-import com.google.android.play.integrity.internal.u
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun FavoriteCard(activity: Activity = getActivities()[1], firestore: FirebaseFirestore, userData: UserData, onClick:(Activity)->Unit) {
+fun FavoriteCard(activity: Activity = getActivities()[1], firestore: FirebaseFirestore, userData: UserData, userActivitiesList: SnapshotStateList<Activity>, onClick:(Activity)->Unit) {
     Card(
         shape = RoundedCornerShape(corner = CornerSize(12.dp)),
         modifier = Modifier
@@ -94,6 +93,8 @@ fun FavoriteCard(activity: Activity = getActivities()[1], firestore: FirebaseFir
                 onClick = {
                     val activityIndex = userData.activities.indexOf(activity)
                     userData.activities[activityIndex].isFavorite = false
+                    userActivitiesList[activityIndex].isFavorite = false
+                    userActivitiesList.removeAt(activityIndex)
 
                     firestore
                         .collection("users")
@@ -103,7 +104,7 @@ fun FavoriteCard(activity: Activity = getActivities()[1], firestore: FirebaseFir
                         .addOnFailureListener { e -> Log.w("Activity Favorite Firestore", "Error updating document", e) }                }
             ) {
                 Icon(
-                    imageVector = Icons.Default.Favorite,
+                    painter = painterResource(R.drawable.heart_minus),
                     contentDescription = "Notification",
                     tint = Color.Black,
                     modifier = Modifier
